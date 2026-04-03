@@ -1,20 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 
 import { toast } from "react-toastify";
 import { authClient } from "@/lib/auth-client";
 
 import { AuthForm } from "./components/AuthForm";
 import { AuthGoogleButton } from "./components/AuthGoogleButton";
+import { AuthAppleButton } from "./components/AuthAppleButton";
 import { AuthSchema } from "@/lib/schemas/auth-schema";
 import { Button } from "@/components/ui/button";
-import { AuthAppleButton } from "./components/AuthAppleButton";
+import { useLanguage } from "@/providers/LanguageProvider";
 
-// ✅ Tipo correto para o ctx
 type AuthErrorCtx = {
   error: {
     message: string;
@@ -25,6 +25,7 @@ export default function Authentication() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleGoogle = async () => {
     try {
@@ -33,8 +34,7 @@ export default function Authentication() {
         provider: "google",
         callbackURL: "/",
       });
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("Erro ao entrar com Google");
     } finally {
       setLoading(false);
@@ -48,8 +48,7 @@ export default function Authentication() {
         provider: "apple",
         callbackURL: "/",
       });
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("Erro ao entrar com Apple");
     } finally {
       setLoading(false);
@@ -58,6 +57,7 @@ export default function Authentication() {
 
   const onSubmit = async (data: AuthSchema) => {
     setLoading(true);
+
     try {
       if (isLogin) {
         await authClient.signIn.email({
@@ -89,8 +89,7 @@ export default function Authentication() {
           },
         });
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("Erro na autenticação");
     } finally {
       setLoading(false);
@@ -98,73 +97,95 @@ export default function Authentication() {
   };
 
   return (
-    <div className="relative min-h-screen flex bg-[#0B0B0B] text-white overflow-hidden">
+    <div className="min-h-screen flex bg-[#050505] text-white relative overflow-hidden">
+      {/* BACKGROUND GRADIENT */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(255,115,0,0.12),transparent_40%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_90%,rgba(255,115,0,0.08),transparent_40%)]" />
+
       {/* LEFT SIDE */}
-      <div className="hidden md:flex w-1/2 relative">
+      <div className="hidden md:flex w-1/2 relative border-r border-white/5">
         <Image
           src="/bg.png"
-          alt="Students learning languages"
+          alt="Background"
           fill
-          className="opacity-10"
-          sizes="50vw"
+          priority
+          loading="eager"
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover opacity-[0.07]"
         />
-        <div className="absolute inset-0" />
-        <div className="relative z-10 p-14 flex flex-col justify-between">
-          <h1 className="text-sm tracking-[0.4em] text-zinc-500 uppercase">
+
+        <div className="relative z-10 p-16 flex flex-col justify-between">
+          <h1 className="text-xs tracking-[0.6em] text-zinc-700 uppercase">
             Wisdom
           </h1>
 
-          <div>
-            <h2 className="text-6xl font-bold leading-tight">
-              Domine novos
-              <span className="bg-clip-text"> idiomas</span>
+          <div className="max-w-md space-y-4">
+            <h2 className="text-3xl font-semibold leading-tight">
+              {t("title")}
             </h2>
-
-            <p className="text-zinc-400 mt-6 max-w-lg">
-              Plataforma moderna para aprendizado de idiomas com foco em
-              fluência real.
+            <p className="text-zinc-400 text-sm leading-relaxed">
+              {t("description")}
             </p>
           </div>
 
-          <p className="text-xs text-zinc-600">
+          <p className="text-xs text-zinc-700">
             © {new Date().getFullYear()} Wisdom School
           </p>
         </div>
       </div>
 
       {/* RIGHT SIDE */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-6 z-10 bg-black">
-        <div className="w-full max-w-md relative">
-          <div className="flex justify-center items-center relative bottom-50">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 relative z-10">
+        <div className="w-full max-w-sm">
+          {/* LOGO */}
+          <div className="flex justify-center mb-4">
             <Image
               src="/wisdom.svg"
-              alt="Auth illustration"
-              width={280}
-              height={280}
-              className="object-contain"
+              alt="Logo"
+              width={120}
+              height={120}
+              className="opacity-90 drop-shadow-[0_0_30px_rgba(255,115,0,0.35)]"
             />
           </div>
 
           {/* CARD */}
-          <div className="absolute top-0 bg-transparent rounded-3xl p-10">
-            <div className="flex gap-15 justify-center">
+          <div className="relative bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-3xl shadow-[0_0_60px_rgba(0,0,0,0.6)] overflow-hidden">
+            {/* GLOW */}
+            <div className="absolute inset-0 bg-linear-to-br from-orange-500/10 via-transparent to-transparent pointer-events-none" />
+
+            {/* SOCIAL */}
+            <div className="flex gap-3 relative z-10">
               <AuthGoogleButton loading={loading} onClick={handleGoogle} />
               <AuthAppleButton loading={loading} onClick={handleApple} />
             </div>
 
-            <AuthForm isLogin={isLogin} loading={loading} onSubmit={onSubmit} />
+            {/* DIVIDER */}
+            <div className="flex items-center gap-3 my-6 relative z-10">
+              <div className="flex-1 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
+              <span className="text-xs text-zinc-500">ou</span>
+              <div className="flex-1 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
+            </div>
 
-            <p className="text-zinc-500 text-sm text-center mt-4">
-              {isLogin
-                ? "Entre para continuar sua jornada"
-                : "Comece sua jornada nos idiomas"}
+            {/* FORM */}
+            <div className="relative z-10">
+              <AuthForm
+                isLogin={isLogin}
+                loading={loading}
+                onSubmit={onSubmit}
+              />
+            </div>
+
+            {/* TEXT */}
+            <p className="text-zinc-400 text-xs text-center mt-5 relative z-10">
+              {isLogin ? `${t("login")}` : `${t("signup")}`}
             </p>
 
-            <p className="text-center text-sm text-zinc-500 mt-6">
+            {/* SWITCH */}
+            <p className="text-center text-sm text-zinc-500 mt-6 relative z-10">
               {isLogin ? "Não tem conta?" : "Já possui conta?"}
               <button
                 onClick={() => setIsLogin(!isLogin)}
-                className="ml-2 text-orange-500 hover:text-orange-400 transition font-medium"
+                className="ml-2 text-orange-500 hover:text-orange-400 transition font-semibold"
               >
                 {isLogin ? "Criar conta" : "Entrar"}
               </button>
@@ -175,7 +196,7 @@ export default function Authentication() {
         {/* BACK BUTTON */}
         <div className="absolute bottom-6 left-6">
           <Link href="/">
-            <Button className="w-12 h-12 rounded-full bg-[#1A1A1A] border border-orange-500/20 hover:bg-orange-600 transition">
+            <Button className="w-11 h-11 rounded-full bg-white/5 border border-white/10 hover:bg-orange-500/20 hover:scale-110 transition-all duration-300 backdrop-blur-xl">
               ←
             </Button>
           </Link>
