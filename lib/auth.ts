@@ -11,13 +11,17 @@ export const auth = betterAuth({
     enabled: true,
   },
 
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 dias
+  },
+
   socialProviders: {
     google: {
       prompt: "select_account",
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
 
-  secret: process.env.AUTH_SECRET as string,
+  secret: process.env.AUTH_SECRET!,
 });

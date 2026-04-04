@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
@@ -12,62 +7,318 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id            String    @id @default(uuid())
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
+//////////////////////////
+// USER & AUTH
+//////////////////////////
 
-  @@unique([email])
+model User {
+  id            String  @id @default(uuid())
+  name          String
+  email         String  @unique
+  emailVerified Boolean @default(false)
+  image         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Auth
+  sessions Session[]
+  accounts Account[]
+
+  // Core
+  subscriptions Subscription[]
+  progresses    UserProgress[]
+  lessons       UserLesson[]
+  achievements  UserAchievement[]
+  reviews       ReviewItem[]
+
+  // Gamification
+  lives  UserLives?
+  streak UserStreak?
+
+  // Ranking
+  leaderboardEntries LeaderboardEntry[]
+
   @@map("user")
 }
 
 model Session {
   id        String   @id
   expiresAt DateTime
-  token     String
-  createdAt DateTime
-  updatedAt DateTime
+  token     String   @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   ipAddress String?
   userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("session")
 }
 
 model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
+  id         String @id
+  accountId  String
+  providerId String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accessToken  String?
+  refreshToken String?
+  idToken      String?
+
   accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime
-  updatedAt             DateTime
+
+  scope    String?
+  password String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("account")
 }
 
 model Verification {
-  id         String    @id
+  id         String @id
   identifier String
   value      String
-  expiresAt  DateTime
-  createdAt  DateTime?
-  updatedAt  DateTime?
+
+  expiresAt DateTime
+  createdAt DateTime?
+  updatedAt DateTime?
 
   @@map("verification")
+}
+
+//////////////////////////
+// LANGUAGE SYSTEM
+//////////////////////////
+
+model Language {
+  id   String @id @default(uuid())
+  code String @unique
+  name String
+
+  // Relações inversas
+  sourceCourses Course[] @relation("SourceLanguage")
+  targetCourses Course[] @relation("TargetLanguage")
+
+  @@map("language")
+}
+
+model Course {
+  id               String @id @default(uuid())
+  sourceLanguageId String
+  targetLanguageId String
+
+  sourceLanguage Language @relation("SourceLanguage", fields: [sourceLanguageId], references: [id])
+  targetLanguage Language @relation("TargetLanguage", fields: [targetLanguageId], references: [id])
+
+  lessons    Lesson[]
+  progresses UserProgress[]
+
+  @@unique([sourceLanguageId, targetLanguageId])
+  @@map("course")
+}
+
+//////////////////////////
+// LESSON SYSTEM
+//////////////////////////
+
+model Lesson {
+  id       String @id @default(uuid())
+  courseId String
+
+  title    String
+  type     LessonType
+  level    Int
+  xpReward Int
+
+  course Course @relation(fields: [courseId], references: [id])
+
+  users   UserLesson[]
+  reviews ReviewItem[]
+
+  @@map("lesson")
+}
+
+enum LessonType {
+  VOCABULARY
+  GRAMMAR
+  LISTENING
+  SPEAKING
+}
+
+model UserLesson {
+  id       String @id @default(uuid())
+  userId   String
+  lessonId String
+
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+
+  @@unique([userId, lessonId])
+  @@map("user_lesson")
+}
+
+//////////////////////////
+// PROGRESS SYSTEM
+//////////////////////////
+
+model UserProgress {
+  id       String @id @default(uuid())
+  userId   String
+  courseId String
+
+  xp    Int @default(0)
+  level Int @default(1)
+
+  completedLessons Int @default(0)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+  @@map("user_progress")
+}
+
+//////////////////////////
+// GAMIFICATION
+//////////////////////////
+
+model UserLives {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  lives     Int
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_lives")
+}
+
+model UserStreak {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  currentDays Int       @default(0)
+  lastStudyAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_streak")
+}
+
+//////////////////////////
+// MONETIZATION
+//////////////////////////
+
+model Plan {
+  id          String  @id @default(uuid())
+  name        String // FREE | PREMIUM
+  maxLives    Int? // null = infinito
+  isUnlimited Boolean @default(false)
+
+  subscriptions Subscription[]
+
+  @@map("plan")
+}
+
+model Subscription {
+  id     String @id @default(uuid())
+  userId String
+  planId String
+
+  startedAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@map("subscription")
+}
+
+//////////////////////////
+// ACHIEVEMENTS
+//////////////////////////
+
+model Achievement {
+  id          String @id @default(uuid())
+  title       String
+  description String
+  xpReward    Int
+
+  users UserAchievement[]
+
+  @@map("achievement")
+}
+
+model UserAchievement {
+  id            String @id @default(uuid())
+  userId        String
+  achievementId String
+
+  unlockedAt DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@map("user_achievement")
+}
+
+//////////////////////////
+// SPACED REPETITION
+//////////////////////////
+
+model ReviewItem {
+  id       String @id @default(uuid())
+  userId   String
+  lessonId String
+
+  nextReview DateTime
+  interval   Int
+  easeFactor Float
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+
+  @@unique([userId, lessonId])
+  @@map("review_item")
+}
+
+//////////////////////////
+// RANKING
+//////////////////////////
+
+model Leaderboard {
+  id   String @id @default(uuid())
+  week Int
+  year Int
+
+  entries LeaderboardEntry[]
+
+  @@map("leaderboard")
+}
+
+model LeaderboardEntry {
+  id            String @id @default(uuid())
+  leaderboardId String
+  userId        String
+
+  xp Int
+
+  leaderboard Leaderboard @relation(fields: [leaderboardId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
+
+  @@unique([leaderboardId, userId])
+  @@map("leaderboard_entry")
 }
