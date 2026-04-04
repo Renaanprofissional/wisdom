@@ -223,7 +223,7 @@ model UserStreak {
 
 model Plan {
   id          String  @id @default(uuid())
-  name        String // FREE | PREMIUM
+  name        String @unique
   maxLives    Int? // null = infinito
   isUnlimited Boolean @default(false)
 
