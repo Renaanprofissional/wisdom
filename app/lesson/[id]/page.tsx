@@ -38,11 +38,9 @@ export default function LessonPage() {
   const [finished, setFinished] = useState(false);
   const [validating, setValidating] = useState(false);
 
-  // controle de vidas
   const [lives, setLives] = useState<number | null>(null);
   const [isUnlimited, setIsUnlimited] = useState(false);
 
-  // ================= RESET =================
   const resetLesson = () => {
     setCurrent(0);
     setSelected(null);
@@ -50,7 +48,6 @@ export default function LessonPage() {
     setFinished(false);
   };
 
-  // ================= FETCH LESSON =================
   useEffect(() => {
     if (!lessonId) return;
 
@@ -86,7 +83,6 @@ export default function LessonPage() {
     return () => controller.abort();
   }, [lessonId, router]);
 
-  // ================= FETCH LIVES =================
   const fetchLives = async () => {
     try {
       const res = await fetch("/api/user/me");
@@ -108,7 +104,6 @@ export default function LessonPage() {
     fetchLives();
   }, []);
 
-  // ================= ANSWER =================
   const handleAnswer = (option: Option) => {
     if (status !== "idle" || validating) return;
     setSelected(option);
@@ -142,7 +137,6 @@ export default function LessonPage() {
         setStatus("wrong");
         toast.error("Resposta errada 😢");
 
-        // 🔥 NÃO REMOVE VIDA EM REVISÃO
         if (!lesson.alreadyCompleted) {
           await fetch("/api/user/remove-life", {
             method: "POST",
@@ -172,7 +166,6 @@ export default function LessonPage() {
     }
   };
 
-  // ================= NEXT =================
   const handleNext = async () => {
     if (!lesson) return;
 
@@ -189,7 +182,6 @@ export default function LessonPage() {
     const isLast = current >= lesson.questions.length - 1;
 
     if (isLast) {
-      //  NÃO COMPLETA SE FOR REVISÃO
       if (lesson.alreadyCompleted) {
         setFinished(true);
         return;
@@ -204,7 +196,6 @@ export default function LessonPage() {
     setStatus("idle");
   };
 
-  // ================= COMPLETE =================
   const completeLesson = async () => {
     if (!lesson || lesson.questions.length === 0) return;
 
@@ -239,21 +230,22 @@ export default function LessonPage() {
     }
   };
 
-  // ================= LOADING =================
   if (!lesson) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#05070F] text-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#050505] text-orange-400 text-lg animate-pulse">
         Carregando lição...
       </div>
     );
   }
 
-  // ================= FINALIZADO =================
   if (finished) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#05070F] text-white gap-6">
-        <h1 className="text-2xl font-bold">🎉 Lição concluída!</h1>
-        <p className="text-white/50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] text-white gap-6 px-6">
+        <h1 className="text-3xl font-bold bg-linear-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
+          🎉 Lição concluída!
+        </h1>
+
+        <p className="text-white/50 text-center">
           {lesson.alreadyCompleted
             ? "Revisão concluída!"
             : "Você ganhou XP e avançou!"}
@@ -262,16 +254,16 @@ export default function LessonPage() {
         <div className="flex gap-4">
           <button
             onClick={resetLesson}
-            className="px-6 py-3 bg-blue-500 rounded-xl"
+            className="px-6 py-3 bg-[#111] border border-orange-500/20 hover:bg-[#1a1a1a] rounded-xl transition"
           >
-            🔁 Refazer lição
+            🔁 Refazer
           </button>
 
           <button
             onClick={() => router.push("/")}
-            className="px-6 py-3 bg-green-500 rounded-xl"
+            className="px-6 py-3 bg-linear-to-r from-orange-400 to-amber-500 text-black font-semibold rounded-xl shadow-lg"
           >
-            Voltar ao Dashboard
+            Dashboard
           </button>
         </div>
       </div>
@@ -281,26 +273,25 @@ export default function LessonPage() {
   const question = lesson.questions[current];
   if (!question) return null;
 
-  // ================= UI =================
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="min-h-screen bg-[#050505] text-white flex flex-col">
       {/* HEADER */}
-      <header className="p-4 border-b border-white/10 space-y-2">
+      <header className="p-5 border-b border-orange-500/10 bg-[#0a0a0a]/80 backdrop-blur-xl space-y-3">
         <p className="text-sm text-white/50">
           {lesson.title} • {current + 1}/{lesson.questions.length}
         </p>
 
         {lesson.alreadyCompleted && (
-          <div className="text-xs text-yellow-400">
-            🔁 Revisando lição já concluída
-          </div>
+          <div className="text-xs text-orange-400">🔁 Revisando lição</div>
         )}
 
-        <div className="text-sm">❤️ {isUnlimited ? "∞" : (lives ?? "...")}</div>
+        <div className="text-sm text-orange-400">
+          ❤️ {isUnlimited ? "∞" : (lives ?? "...")}
+        </div>
 
-        <div className="w-full h-2 bg-white/10 rounded-full">
+        <div className="w-full h-2 bg-[#111] rounded-full overflow-hidden">
           <div
-            className="h-2 bg-[#e36a00] rounded-full transition-all"
+            className="h-2 bg-linear-to-r from-orange-400 to-amber-500 shadow-[0_0_10px_rgba(255,140,0,0.7)] transition-all"
             style={{
               width: `${((current + 1) / lesson.questions.length) * 100}%`,
             }}
@@ -309,25 +300,30 @@ export default function LessonPage() {
       </header>
 
       {/* CONTENT */}
-      <main className="flex-1 flex flex-col justify-center items-center p-6 gap-6">
-        <h2 className="text-xl font-bold text-center">{question.question}</h2>
+      <main className="flex-1 flex flex-col justify-center items-center p-6 gap-8">
+        <h2 className="text-2xl font-bold text-center max-w-lg leading-snug">
+          {question.question}
+        </h2>
 
-        <div className="w-full max-w-md space-y-3">
+        <div className="w-full max-w-md space-y-4">
           {question.options.map((opt) => {
             const isSelected = selected?.id === opt.id;
 
-            let style = "bg-white/5 border-white/10 hover:bg-white/10";
+            let style = "bg-[#0f0f0f] border-orange-500/10 hover:bg-[#1a1a1a]";
 
             if (isSelected && status === "idle") {
-              style = "bg-blue-500/20 border-blue-500";
+              style =
+                "bg-orange-500/10 border-orange-500 shadow-[0_0_10px_rgba(255,140,0,0.5)]";
             }
 
             if (status === "correct" && isSelected) {
-              style = "bg-green-500/20 border-green-500";
+              style =
+                "bg-green-500/20 border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]";
             }
 
             if (status === "wrong" && isSelected) {
-              style = "bg-red-500/20 border-red-500";
+              style =
+                "bg-red-500/20 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]";
             }
 
             return (
@@ -335,7 +331,7 @@ export default function LessonPage() {
                 key={opt.id}
                 disabled={status !== "idle" || validating}
                 onClick={() => handleAnswer(opt)}
-                className={`w-full p-4 rounded-xl border text-left transition ${style}`}
+                className={`w-full p-4 rounded-xl border text-left transition-all duration-200 ${style}`}
               >
                 {opt.text}
               </button>
@@ -345,14 +341,14 @@ export default function LessonPage() {
       </main>
 
       {/* FOOTER */}
-      <footer className="p-4 border-t border-white/10">
+      <footer className="p-5 border-t border-orange-500/10 bg-[#0a0a0a]/80 backdrop-blur-xl">
         {status === "wrong" ? (
           <button
             onClick={() => {
               setSelected(null);
               setStatus("idle");
             }}
-            className="w-full py-3 bg-red-500 rounded-xl font-semibold"
+            className="w-full py-3 bg-red-500/80 hover:bg-red-500 rounded-xl font-semibold transition"
           >
             Tentar novamente
           </button>
@@ -360,7 +356,7 @@ export default function LessonPage() {
           <button
             onClick={handleNext}
             disabled={!selected || loading || validating}
-            className="w-full py-3 bg-[#e36a00] rounded-xl font-semibold disabled:opacity-50"
+            className="w-full py-3 bg-linear-to-r from-orange-400 to-amber-500 text-black font-semibold rounded-xl shadow-lg disabled:opacity-40 transition"
           >
             {validating
               ? "Verificando..."
