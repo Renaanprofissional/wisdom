@@ -9,6 +9,8 @@ import { FaFire, FaHeart } from "react-icons/fa";
 import { GiBatwingEmblem } from "react-icons/gi";
 import { BsStars } from "react-icons/bs";
 
+import { NavMenu } from "@/components/common/navMenu";
+
 type Stats = {
   xp: number;
   level: number;
@@ -142,7 +144,7 @@ export default function DashboardPage() {
       : 0;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col">
+    <div className="min-h-screen bg-[#050505] text-white flex flex-col pb-20">
       {/* HEADER */}
       <header className="bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-orange-500/10 px-6 py-4 flex justify-between items-center shadow-lg">
         <h1 className="font-bold text-xl tracking-wide bg-linear-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
@@ -167,6 +169,7 @@ export default function DashboardPage() {
       </header>
 
       {/* MAIN */}
+
       <main className="flex-1 max-w-2xl w-full mx-auto p-6 space-y-10">
         {/* STATS */}
         <div className="grid grid-cols-4 gap-4">
@@ -182,7 +185,7 @@ export default function DashboardPage() {
         {/* PROGRESS BAR */}
         <div className="w-full bg-[#111] rounded-full h-3 overflow-hidden shadow-inner">
           <div
-            className="bg-linear-to-r from-orange-400 via-orange-500 to-amber-500 h-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(255,140,0,0.6)]"
+            className="bg-linear-to-r from-orange-400 via-orange-500 to-amber-500 h-full transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -194,7 +197,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* MAPA */}
+        {/* 🔥 MAPA (DUOLINGO STYLE RESTAURADO) */}
         <div className="flex flex-col items-center gap-8 mt-10">
           {lessons.map((lesson, index) => {
             const isCurrent = lesson.level === stats.level;
@@ -214,18 +217,18 @@ export default function DashboardPage() {
                   onClick={() => handleLessonClick(lesson)}
                   disabled={lesson.locked || isBlocked}
                   className={`
-                    w-20 h-20 rounded-full flex items-center justify-center text-xl font-bold
-                    transition-all duration-300
-                    ${
-                      lesson.locked
-                        ? "bg-[#1a1a1a] text-gray-500 cursor-not-allowed"
-                        : lesson.completed
-                          ? "bg-orange-500/70 ring-2 ring-orange-300 shadow-lg scale-95"
-                          : isCurrent
-                            ? "bg-linear-to-br from-orange-400 to-amber-500 hover:scale-110 shadow-[0_0_25px_rgba(255,140,0,0.7)]"
-                            : "bg-[#111] hover:bg-[#1a1a1a] border border-orange-500/10 hover:scale-105"
-                    }
-                  `}
+              w-20 h-20 rounded-full flex items-center justify-center text-xl font-bold
+              transition-all duration-300
+              ${
+                lesson.locked
+                  ? "bg-[#1a1a1a] text-gray-500 cursor-not-allowed"
+                  : lesson.completed
+                    ? "bg-orange-500/70 ring-2 ring-orange-300 shadow-lg scale-95"
+                    : isCurrent
+                      ? "bg-linear-to-br from-orange-400 to-amber-500 hover:scale-110 shadow-[0_0_25px_rgba(255,140,0,0.7)]"
+                      : "bg-[#111] hover:bg-[#1a1a1a] border border-orange-500/10 hover:scale-105"
+              }
+            `}
                 >
                   {lesson.locked
                     ? "🔒"
@@ -248,10 +251,8 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* FOOTER */}
-      <footer className="border-t border-orange-500/10 text-center text-xs text-orange-400/40 py-4">
-        © 2026 Wisdom
-      </footer>
+      {/* 🔥 BOTTOM MENU */}
+      <NavMenu />
     </div>
   );
 }
@@ -264,5 +265,29 @@ function Stat({ label, value }: { label: React.ReactNode; value: any }) {
         {label}
       </span>
     </div>
+  );
+}
+
+function NavItem({
+  icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-col items-center text-xs transition ${
+        active ? "text-orange-400 scale-110" : "text-white/40 hover:text-white"
+      }`}
+    >
+      <div className="text-lg">{icon}</div>
+      <span>{label}</span>
+    </button>
   );
 }
