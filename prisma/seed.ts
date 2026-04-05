@@ -2,7 +2,7 @@ import prisma from "../lib/prisma";
 import { LessonType, LessonDifficulty } from "../app/generated/prisma/client";
 
 async function main() {
-  console.log("🌱 Seeding ULTRA...");
+  console.log("🌱 Seeding...");
 
   // =========================
   // 🌍 LANGUAGES
@@ -10,13 +10,19 @@ async function main() {
   const pt = await prisma.language.upsert({
     where: { code: "pt" },
     update: {},
-    create: { code: "pt", name: "Português" },
+    create: {
+      code: "pt",
+      name: "Português",
+    },
   });
 
   const en = await prisma.language.upsert({
     where: { code: "en" },
     update: {},
-    create: { code: "en", name: "English" },
+    create: {
+      code: "en",
+      name: "English",
+    },
   });
 
   // =========================
@@ -39,186 +45,144 @@ async function main() {
   // =========================
   // 💰 PLANS
   // =========================
-  await prisma.plan.createMany({
-    data: [
-      { name: "FREE", maxLives: 5 },
-      { name: "PLUS", maxLives: 10 },
-      { name: "PRO", isUnlimited: true },
-    ],
-    skipDuplicates: true,
+  const freePlan = await prisma.plan.upsert({
+    where: { name: "FREE" },
+    update: {},
+    create: {
+      name: "FREE",
+      maxLives: 5,
+      isUnlimited: false,
+    },
+  });
+
+  const proPlan = await prisma.plan.upsert({
+    where: { name: "PRO" },
+    update: {},
+    create: {
+      name: "PRO",
+      isUnlimited: true,
+    },
   });
 
   // =========================
-  // 🧠 HELPERS
+  // 📘 LESSONS
+  // =========================
+  const lesson1 = await prisma.lesson.upsert({
+    where: {
+      courseId_title: {
+        courseId: course.id,
+        title: "Basics 1",
+      },
+    },
+    update: {},
+    create: {
+      courseId: course.id,
+      title: "Basics 1",
+      type: "VOCABULARY",
+      level: 1,
+      difficulty: "ROOKIE",
+      xpReward: 20,
+    },
+  });
+
+  const lesson2 = await prisma.lesson.upsert({
+    where: {
+      courseId_title: {
+        courseId: course.id,
+        title: "Basics 2",
+      },
+    },
+    update: {},
+    create: {
+      courseId: course.id,
+      title: "Basics 2",
+      type: "VOCABULARY",
+      level: 2,
+      difficulty: "ROOKIE",
+      xpReward: 25,
+    },
+  });
+
+  // =========================
+  // ❓ QUESTIONS (LESSON 1)
   // =========================
 
-  const lessonThemes = [
-    "Animals",
-    "Food",
-    "People",
-    "Travel",
-    "Work",
-    "Emotions",
-    "Health",
-    "Shopping",
-    "Technology",
-    "Education",
-  ];
+  // limpa antigas (evita duplicação)
+  await prisma.answerOption.deleteMany();
+  await prisma.question.deleteMany();
 
-  const xpByDifficulty = {
-    ROOKIE: 20,
-    EXPLORER: 35,
-    SPEAKER: 50,
-    THINKER: 70,
-    FLUENT: 90,
-    MASTER: 120,
-  };
-
-  function getDifficulty(level: number): LessonDifficulty {
-    if (level <= 3) return "ROOKIE";
-    if (level <= 6) return "EXPLORER";
-    if (level <= 9) return "SPEAKER";
-    if (level <= 12) return "THINKER";
-    if (level <= 16) return "FLUENT";
-    return "MASTER";
-  }
-
-  function generateQuestions(level: number) {
-    const base = 5;
-    const extra = Math.floor(level / 2);
-    const total = base + extra;
-
-    const templates = [
-      () => ({
-        question: "Como se diz 'cachorro'?",
-        options: [
+  const q1 = await prisma.question.create({
+    data: {
+      lessonId: lesson1.id,
+      question: "Como se diz 'cachorro' em inglês?",
+      order: 1,
+      options: {
+        create: [
           { text: "Dog", isCorrect: true },
           { text: "Cat", isCorrect: false },
           { text: "Bird", isCorrect: false },
         ],
-      }),
-      () => ({
-        question: "Como se diz 'gato'?",
-        options: [
-          { text: "Cat", isCorrect: true },
+      },
+    },
+  });
+
+  const q2 = await prisma.question.create({
+    data: {
+      lessonId: lesson1.id,
+      question: "Como se diz 'gato' em inglês?",
+      order: 2,
+      options: {
+        create: [
           { text: "Dog", isCorrect: false },
+          { text: "Cat", isCorrect: true },
           { text: "Fish", isCorrect: false },
         ],
-      }),
-      () => ({
-        question: "Traduza: 'I eat every day'",
-        options: [
-          { text: "Eu como todo dia", isCorrect: true },
-          { text: "Eu bebo todo dia", isCorrect: false },
-          { text: "Eu vejo todo dia", isCorrect: false },
-        ],
-      }),
-      () => ({
-        question: "Traduza: 'She is happy'",
-        options: [
-          { text: "Ela está feliz", isCorrect: true },
-          { text: "Ela está triste", isCorrect: false },
-          { text: "Ela está cansada", isCorrect: false },
-        ],
-      }),
-      () => ({
-        question: "Como se diz 'correr'?",
-        options: [
-          { text: "Run", isCorrect: true },
-          { text: "Sleep", isCorrect: false },
-          { text: "Eat", isCorrect: false },
-        ],
-      }),
-      () => ({
-        question: "Traduza: 'They are friends'",
-        options: [
-          { text: "Eles são amigos", isCorrect: true },
-          { text: "Eles estão amigos", isCorrect: false },
-          { text: "Eles têm amigos", isCorrect: false },
-        ],
-      }),
-    ];
-
-    return Array.from({ length: total }).map((_, i) => {
-      const template = templates[i % templates.length]();
-      return {
-        order: i + 1,
-        ...template,
-      };
-    });
-  }
-
-  async function createLessonWithQuestions({
-    title,
-    level,
-    difficulty,
-    xpReward,
-    questions,
-  }: any) {
-    const lesson = await prisma.lesson.upsert({
-      where: {
-        courseId_title: {
-          courseId: course.id,
-          title,
-        },
       },
-      update: {},
-      create: {
-        courseId: course.id,
-        title,
-        type: "VOCABULARY",
-        level,
-        difficulty,
-        xpReward,
-      },
-    });
-
-    await prisma.answerOption.deleteMany({
-      where: { question: { lessonId: lesson.id } },
-    });
-
-    await prisma.question.deleteMany({
-      where: { lessonId: lesson.id },
-    });
-
-    for (const q of questions) {
-      await prisma.question.create({
-        data: {
-          lessonId: lesson.id,
-          question: q.question,
-          order: q.order,
-          options: {
-            create: q.options,
-          },
-        },
-      });
-    }
-  }
+    },
+  });
 
   // =========================
-  // 🔥 GENERATE LEVELS 1 → 20
+  // ❓ QUESTIONS (LESSON 2)
   // =========================
 
-  for (let level = 1; level <= 20; level++) {
-    const difficulty = getDifficulty(level);
-    const xpReward = xpByDifficulty[difficulty];
+  const q3 = await prisma.question.create({
+    data: {
+      lessonId: lesson2.id,
+      question: "Como se diz 'água' em inglês?",
+      order: 1,
+      options: {
+        create: [
+          { text: "Water", isCorrect: true },
+          { text: "Fire", isCorrect: false },
+          { text: "Earth", isCorrect: false },
+        ],
+      },
+    },
+  });
 
-    for (let i = 0; i < 3; i++) {
-      const theme = lessonThemes[i % lessonThemes.length];
+  const q4 = await prisma.question.create({
+    data: {
+      lessonId: lesson2.id,
+      question: "Como se diz 'fogo' em inglês?",
+      order: 2,
+      options: {
+        create: [
+          { text: "Water", isCorrect: false },
+          { text: "Fire", isCorrect: true },
+          { text: "Air", isCorrect: false },
+        ],
+      },
+    },
+  });
 
-      await createLessonWithQuestions({
-        title: `Level ${level} - ${theme} ${i + 1}`,
-        level,
-        difficulty,
-        xpReward,
-        questions: generateQuestions(level),
-      });
-    }
-  }
-
-  console.log("✅ Seed ULTRA finalizado!");
+  console.log("✅ Seed finalizado com sucesso!");
 }
 
 main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
+  .catch((e) => {
+    console.error("❌ Erro no seed:", e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
