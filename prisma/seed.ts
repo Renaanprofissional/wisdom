@@ -2,7 +2,7 @@ import prisma from "../lib/prisma";
 import { LessonType, LessonDifficulty } from "../app/generated/prisma/client";
 
 async function main() {
-  console.log("🌱 Seeding PRO...");
+  console.log("🌱 Seeding ULTRA...");
 
   // =========================
   // 🌍 LANGUAGES
@@ -37,7 +37,7 @@ async function main() {
   });
 
   // =========================
-  // 💰 PLANS (SaaS Strategy)
+  // 💰 PLANS
   // =========================
   await prisma.plan.createMany({
     data: [
@@ -49,8 +49,105 @@ async function main() {
   });
 
   // =========================
-  // 📘 LESSON BUILDER
+  // 🧠 HELPERS
   // =========================
+
+  const lessonThemes = [
+    "Animals",
+    "Food",
+    "People",
+    "Travel",
+    "Work",
+    "Emotions",
+    "Health",
+    "Shopping",
+    "Technology",
+    "Education",
+  ];
+
+  const xpByDifficulty = {
+    ROOKIE: 20,
+    EXPLORER: 35,
+    SPEAKER: 50,
+    THINKER: 70,
+    FLUENT: 90,
+    MASTER: 120,
+  };
+
+  function getDifficulty(level: number): LessonDifficulty {
+    if (level <= 3) return "ROOKIE";
+    if (level <= 6) return "EXPLORER";
+    if (level <= 9) return "SPEAKER";
+    if (level <= 12) return "THINKER";
+    if (level <= 16) return "FLUENT";
+    return "MASTER";
+  }
+
+  function generateQuestions(level: number) {
+    const base = 5;
+    const extra = Math.floor(level / 2);
+    const total = base + extra;
+
+    const templates = [
+      () => ({
+        question: "Como se diz 'cachorro'?",
+        options: [
+          { text: "Dog", isCorrect: true },
+          { text: "Cat", isCorrect: false },
+          { text: "Bird", isCorrect: false },
+        ],
+      }),
+      () => ({
+        question: "Como se diz 'gato'?",
+        options: [
+          { text: "Cat", isCorrect: true },
+          { text: "Dog", isCorrect: false },
+          { text: "Fish", isCorrect: false },
+        ],
+      }),
+      () => ({
+        question: "Traduza: 'I eat every day'",
+        options: [
+          { text: "Eu como todo dia", isCorrect: true },
+          { text: "Eu bebo todo dia", isCorrect: false },
+          { text: "Eu vejo todo dia", isCorrect: false },
+        ],
+      }),
+      () => ({
+        question: "Traduza: 'She is happy'",
+        options: [
+          { text: "Ela está feliz", isCorrect: true },
+          { text: "Ela está triste", isCorrect: false },
+          { text: "Ela está cansada", isCorrect: false },
+        ],
+      }),
+      () => ({
+        question: "Como se diz 'correr'?",
+        options: [
+          { text: "Run", isCorrect: true },
+          { text: "Sleep", isCorrect: false },
+          { text: "Eat", isCorrect: false },
+        ],
+      }),
+      () => ({
+        question: "Traduza: 'They are friends'",
+        options: [
+          { text: "Eles são amigos", isCorrect: true },
+          { text: "Eles estão amigos", isCorrect: false },
+          { text: "Eles têm amigos", isCorrect: false },
+        ],
+      }),
+    ];
+
+    return Array.from({ length: total }).map((_, i) => {
+      const template = templates[i % templates.length]();
+      return {
+        order: i + 1,
+        ...template,
+      };
+    });
+  }
+
   async function createLessonWithQuestions({
     title,
     level,
@@ -76,7 +173,6 @@ async function main() {
       },
     });
 
-    // remove antigas
     await prisma.answerOption.deleteMany({
       where: { question: { lessonId: lesson.id } },
     });
@@ -100,130 +196,27 @@ async function main() {
   }
 
   // =========================
-  // 🧠 LESSONS (TRILHA REAL)
+  // 🔥 GENERATE LEVELS 1 → 20
   // =========================
 
-  // 🔰 LEVEL 1 - BASICS
-  await createLessonWithQuestions({
-    title: "Basics - Animals",
-    level: 1,
-    difficulty: "ROOKIE",
-    xpReward: 20,
-    questions: [
-      {
-        order: 1,
-        question: "Como se diz 'cachorro'?",
-        options: [
-          { text: "Dog", isCorrect: true },
-          { text: "Cat", isCorrect: false },
-          { text: "Bird", isCorrect: false },
-        ],
-      },
-      {
-        order: 2,
-        question: "Como se diz 'gato'?",
-        options: [
-          { text: "Dog", isCorrect: false },
-          { text: "Cat", isCorrect: true },
-          { text: "Fish", isCorrect: false },
-        ],
-      },
-      {
-        order: 3,
-        question: "Como se diz 'pássaro'?",
-        options: [
-          { text: "Bird", isCorrect: true },
-          { text: "Dog", isCorrect: false },
-          { text: "Snake", isCorrect: false },
-        ],
-      },
-    ],
-  });
+  for (let level = 1; level <= 20; level++) {
+    const difficulty = getDifficulty(level);
+    const xpReward = xpByDifficulty[difficulty];
 
-  await createLessonWithQuestions({
-    title: "Basics - Food",
-    level: 1,
-    difficulty: "ROOKIE",
-    xpReward: 20,
-    questions: [
-      {
-        order: 1,
-        question: "Como se diz 'água'?",
-        options: [
-          { text: "Water", isCorrect: true },
-          { text: "Juice", isCorrect: false },
-          { text: "Milk", isCorrect: false },
-        ],
-      },
-      {
-        order: 2,
-        question: "Como se diz 'pão'?",
-        options: [
-          { text: "Bread", isCorrect: true },
-          { text: "Rice", isCorrect: false },
-          { text: "Meat", isCorrect: false },
-        ],
-      },
-    ],
-  });
+    for (let i = 0; i < 3; i++) {
+      const theme = lessonThemes[i % lessonThemes.length];
 
-  // 🔥 LEVEL 2 - SURVIVAL
-  await createLessonWithQuestions({
-    title: "Survival - Greetings",
-    level: 2,
-    difficulty: "EXPLORER",
-    xpReward: 30,
-    questions: [
-      {
-        order: 1,
-        question: "Como se diz 'olá'?",
-        options: [
-          { text: "Hello", isCorrect: true },
-          { text: "Bye", isCorrect: false },
-          { text: "Thanks", isCorrect: false },
-        ],
-      },
-      {
-        order: 2,
-        question: "Como se diz 'obrigado'?",
-        options: [
-          { text: "Please", isCorrect: false },
-          { text: "Thanks", isCorrect: true },
-          { text: "Sorry", isCorrect: false },
-        ],
-      },
-    ],
-  });
+      await createLessonWithQuestions({
+        title: `Level ${level} - ${theme} ${i + 1}`,
+        level,
+        difficulty,
+        xpReward,
+        questions: generateQuestions(level),
+      });
+    }
+  }
 
-  // ⚡ LEVEL 3 - DAILY LIFE
-  await createLessonWithQuestions({
-    title: "Daily - Actions",
-    level: 3,
-    difficulty: "SPEAKER",
-    xpReward: 40,
-    questions: [
-      {
-        order: 1,
-        question: "Como se diz 'comer'?",
-        options: [
-          { text: "Eat", isCorrect: true },
-          { text: "Drink", isCorrect: false },
-          { text: "Sleep", isCorrect: false },
-        ],
-      },
-      {
-        order: 2,
-        question: "Como se diz 'dormir'?",
-        options: [
-          { text: "Sleep", isCorrect: true },
-          { text: "Run", isCorrect: false },
-          { text: "Walk", isCorrect: false },
-        ],
-      },
-    ],
-  });
-
-  console.log("✅ Seed PRO finalizado!");
+  console.log("✅ Seed ULTRA finalizado!");
 }
 
 main()
