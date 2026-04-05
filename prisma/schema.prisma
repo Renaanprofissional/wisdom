@@ -24,19 +24,19 @@ model User {
   sessions Session[]
   accounts Account[]
 
-  role UserRole @default(USER)
+  role          UserRole @default(USER)
 
-  // 🔥 RELAÇÃO 1 (todas subscriptions)
+  //  (todas subscriptions)
   subscriptions Subscription[] @relation("UserSubscriptions")
 
-  // 🔥 RELAÇÃO 2 (ativa)
+  //  (ativa)
   activeSubscriptionId String?
   activeSubscription   Subscription? @relation("ActiveSubscription", fields: [activeSubscriptionId], references: [id])
 
-  progresses   UserProgress[]
-  lessons      UserLesson[]
-  achievements UserAchievement[]
-  reviews      ReviewItem[]
+  progresses    UserProgress[]
+  lessons       UserLesson[]
+  achievements  UserAchievement[]
+  reviews       ReviewItem[]
 
   lives  UserLives?
   streak UserStreak?
@@ -63,7 +63,7 @@ model Session {
   userAgent String?
 
   userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
 }
@@ -74,7 +74,7 @@ model Account {
   providerId String
 
   userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   accessToken  String?
   refreshToken String?
@@ -142,11 +142,11 @@ model Lesson {
   id       String @id @default(uuid())
   courseId String
 
-  title String
-  type  LessonType
+  title    String
+  type     LessonType
 
-  level      Int
-  difficulty LessonDifficulty
+  level       Int
+  difficulty  LessonDifficulty
 
   xpReward Int
 
@@ -155,7 +155,7 @@ model Lesson {
   users   UserLesson[]
   reviews ReviewItem[]
 
-  // ✅ NOVO (perguntas)
+
   questions Question[]
 
   @@unique([courseId, title])
@@ -354,11 +354,11 @@ model LeaderboardEntry {
 //////////////////////////
 
 model Question {
-  id       String @id @default(uuid())
-  lessonId String
+  id        String @id @default(uuid())
+  lessonId  String
 
-  question String
-  order    Int
+  question  String
+  order     Int
 
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
