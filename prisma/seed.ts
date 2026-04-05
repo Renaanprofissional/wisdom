@@ -81,7 +81,7 @@ async function main() {
       type: "VOCABULARY",
       level: 1,
       difficulty: "ROOKIE",
-      xpReward: 20,
+      xpReward: 100,
     },
   });
 
@@ -99,7 +99,7 @@ async function main() {
       type: "VOCABULARY",
       level: 2,
       difficulty: "ROOKIE",
-      xpReward: 25,
+      xpReward: 150,
     },
   });
 

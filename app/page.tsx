@@ -5,6 +5,9 @@ import { toast } from "react-toastify";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { FaFire, FaHeart } from "react-icons/fa";
+import { GiBatwingEmblem } from "react-icons/gi";
+import { BsStars } from "react-icons/bs";
 
 type Stats = {
   xp: number;
@@ -13,7 +16,7 @@ type Stats = {
   streak: number;
   currentLevelXp?: number;
   xpToNextLevel?: number;
-  plan: {
+  plan?: {
     name: string;
     isUnlimited: boolean;
   };
@@ -36,28 +39,42 @@ export default function DashboardPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const isBlocked = !!stats && !stats.plan.isUnlimited && stats.lives <= 0;
+  const isBlocked =
+    !!stats && !(stats.plan?.isUnlimited ?? false) && stats.lives <= 0;
 
-  // ================= FETCH STATS =================
   const fetchStats = useCallback(async () => {
     try {
       const res = await fetch("/api/user/me", {
         cache: "no-store",
       });
 
+      if (!res.ok) {
+        throw new Error("Erro ao buscar stats");
+      }
+
       const data = await res.json();
-      setStats(data);
+
+      setStats({
+        ...data,
+        plan: data.plan ?? {
+          name: "FREE",
+          isUnlimited: false,
+        },
+      });
     } catch {
       toast.error("Erro ao carregar dados");
     }
   }, []);
 
-  // ================= FETCH LESSONS =================
   const fetchLessons = useCallback(async () => {
     try {
       const res = await fetch("/api/lesson", {
         cache: "no-store",
       });
+
+      if (!res.ok) {
+        throw new Error("Erro ao buscar lições");
+      }
 
       const data = await res.json();
       setLessons(data);
@@ -82,7 +99,6 @@ export default function DashboardPage() {
     return () => window.removeEventListener("focus", handleFocus);
   }, [fetchStats]);
 
-  // ================= CLICK LESSON =================
   const handleLessonClick = (lesson: Lesson) => {
     if (isBlocked) {
       toast.error("Você está sem vidas 😢");
@@ -94,7 +110,6 @@ export default function DashboardPage() {
       return;
     }
 
-    //  AGORA PERMITE REFAZER
     if (lesson.completed) {
       toast.info("Refazendo lição 🔁");
       router.push(`/lesson/${lesson.id}`);
@@ -127,7 +142,7 @@ export default function DashboardPage() {
       : 0;
 
   return (
-    <div className="min-h-screen bg-[#05070F] text-white flex flex-col">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       {/* HEADER */}
       <header className="border-b border-white/10 px-6 py-4 flex justify-between items-center">
         <h1 className="font-bold text-lg">Wisdom</h1>
@@ -135,7 +150,9 @@ export default function DashboardPage() {
         <div className="flex items-center gap-4">
           <div className="text-right">
             <p className="text-sm">{user.name}</p>
-            <p className="text-xs text-white/50">{stats.plan.name}</p>
+            <p className="text-xs text-white/50">
+              {stats.plan?.name ?? "FREE"}
+            </p>
           </div>
 
           <button
@@ -151,10 +168,21 @@ export default function DashboardPage() {
       <main className="flex-1 max-w-2xl w-full mx-auto p-6 space-y-8">
         {/* STATS */}
         <div className="grid grid-cols-4 gap-3">
-          <Stat label="XP" value={stats.xp} />
-          <Stat label="Nível" value={stats.level} />
-          <Stat label="🔥" value={stats.streak} />
-          <Stat label="❤️" value={stats.plan.isUnlimited ? "∞" : stats.lives} />
+          <div>
+            <Stat label={<BsStars />} value={stats.xp} />
+          </div>
+          <div>
+            <Stat label={<GiBatwingEmblem />} value={stats.level} />
+          </div>
+          <div>
+            <Stat label={<FaFire />} value={stats.streak} />
+          </div>
+          <div>
+            <Stat
+              label={<FaHeart />}
+              value={stats.plan?.isUnlimited ? "∞" : stats.lives}
+            />
+          </div>
         </div>
 
         {/* PROGRESS BAR */}
@@ -198,7 +226,7 @@ export default function DashboardPage() {
                         : lesson.completed
                           ? "bg-blue-500 opacity-70 ring-2 ring-blue-300"
                           : isCurrent
-                            ? "bg-green-500 scale-110 shadow-lg"
+                            ? "bg-[#d07300] hover:bg-[#734504] scale-110 shadow-lg"
                             : "bg-white/10 hover:bg-white/20"
                     }
                   `}
@@ -232,11 +260,13 @@ export default function DashboardPage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: any }) {
+function Stat({ label, value }: { label: React.ReactNode; value: any }) {
   return (
     <div className="bg-white/5 p-3 rounded-xl text-center">
       <p className="text-sm font-bold">{value}</p>
-      <span className="text-[10px] text-white/50">{label}</span>
+      <span className="text-[14px] text-white/70 flex justify-center">
+        {label}
+      </span>
     </div>
   );
 }

@@ -283,7 +283,7 @@ export default function LessonPage() {
 
   // ================= UI =================
   return (
-    <div className="min-h-screen bg-[#05070F] text-white flex flex-col">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       {/* HEADER */}
       <header className="p-4 border-b border-white/10 space-y-2">
         <p className="text-sm text-white/50">
@@ -300,7 +300,7 @@ export default function LessonPage() {
 
         <div className="w-full h-2 bg-white/10 rounded-full">
           <div
-            className="h-2 bg-green-500 rounded-full transition-all"
+            className="h-2 bg-[#e36a00] rounded-full transition-all"
             style={{
               width: `${((current + 1) / lesson.questions.length) * 100}%`,
             }}
@@ -360,7 +360,7 @@ export default function LessonPage() {
           <button
             onClick={handleNext}
             disabled={!selected || loading || validating}
-            className="w-full py-3 bg-green-500 rounded-xl font-semibold disabled:opacity-50"
+            className="w-full py-3 bg-[#e36a00] rounded-xl font-semibold disabled:opacity-50"
           >
             {validating
               ? "Verificando..."
