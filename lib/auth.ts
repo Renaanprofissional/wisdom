@@ -11,6 +11,14 @@ export const auth = betterAuth({
     enabled: true,
   },
 
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+      },
+    },
+  },
+
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 dias
   },

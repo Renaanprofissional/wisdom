@@ -21,25 +21,34 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Auth
   sessions Session[]
   accounts Account[]
 
-  // Core
-  subscriptions Subscription[]
-  progresses    UserProgress[]
-  lessons       UserLesson[]
-  achievements  UserAchievement[]
-  reviews       ReviewItem[]
+  role UserRole @default(USER)
 
-  // Gamification
+  // 🔥 RELAÇÃO 1 (todas subscriptions)
+  subscriptions Subscription[] @relation("UserSubscriptions")
+
+  // 🔥 RELAÇÃO 2 (ativa)
+  activeSubscriptionId String?
+  activeSubscription   Subscription? @relation("ActiveSubscription", fields: [activeSubscriptionId], references: [id])
+
+  progresses   UserProgress[]
+  lessons      UserLesson[]
+  achievements UserAchievement[]
+  reviews      ReviewItem[]
+
   lives  UserLives?
   streak UserStreak?
 
-  // Ranking
   leaderboardEntries LeaderboardEntry[]
 
   @@map("user")
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
 
 model Session {
@@ -104,7 +113,6 @@ model Language {
   code String @unique
   name String
 
-  // Relações inversas
   sourceCourses Course[] @relation("SourceLanguage")
   targetCourses Course[] @relation("TargetLanguage")
 
@@ -134,9 +142,12 @@ model Lesson {
   id       String @id @default(uuid())
   courseId String
 
-  title    String
-  type     LessonType
-  level    Int
+  title String
+  type  LessonType
+
+  level      Int
+  difficulty LessonDifficulty
+
   xpReward Int
 
   course Course @relation(fields: [courseId], references: [id])
@@ -144,6 +155,10 @@ model Lesson {
   users   UserLesson[]
   reviews ReviewItem[]
 
+  // ✅ NOVO (perguntas)
+  questions Question[]
+
+  @@unique([courseId, title])
   @@map("lesson")
 }
 
@@ -152,6 +167,15 @@ enum LessonType {
   GRAMMAR
   LISTENING
   SPEAKING
+}
+
+enum LessonDifficulty {
+  ROOKIE
+  EXPLORER
+  SPEAKER
+  THINKER
+  FLUENT
+  MASTER
 }
 
 model UserLesson {
@@ -223,8 +247,8 @@ model UserStreak {
 
 model Plan {
   id          String  @id @default(uuid())
-  name        String @unique
-  maxLives    Int? // null = infinito
+  name        String  @unique
+  maxLives    Int?
   isUnlimited Boolean @default(false)
 
   subscriptions Subscription[]
@@ -240,8 +264,10 @@ model Subscription {
   startedAt DateTime  @default(now())
   expiresAt DateTime?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation("UserSubscriptions", fields: [userId], references: [id], onDelete: Cascade)
   plan Plan @relation(fields: [planId], references: [id])
+
+  activeForUsers User[] @relation("ActiveSubscription")
 
   @@map("subscription")
 }
@@ -321,4 +347,34 @@ model LeaderboardEntry {
 
   @@unique([leaderboardId, userId])
   @@map("leaderboard_entry")
+}
+
+//////////////////////////
+// QUESTIONS SYSTEM (NOVO)
+//////////////////////////
+
+model Question {
+  id       String @id @default(uuid())
+  lessonId String
+
+  question String
+  order    Int
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  options AnswerOption[]
+
+  @@map("question")
+}
+
+model AnswerOption {
+  id         String @id @default(uuid())
+  questionId String
+
+  text      String
+  isCorrect Boolean @default(false)
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("answer_option")
 }

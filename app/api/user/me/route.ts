@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { initializeUser } from "@/lib/init-user";
+import { calculateLives } from "@/lib/lives";
+import { getLevelFromXp } from "@/lib/level";
 
 export async function GET(req: Request) {
   try {
@@ -14,36 +17,91 @@ export async function GET(req: Request) {
 
     const userId = session.user.id;
 
-    const [progress, lives, streak, subscription] = await Promise.all([
-      prisma.userProgress.findFirst({
-        where: { userId },
-      }),
-      prisma.userLives.findUnique({
-        where: { userId },
-      }),
-      prisma.userStreak.findUnique({
-        where: { userId },
-      }),
-      prisma.subscription.findFirst({
-        where: { userId },
-        include: { plan: true },
-      }),
+    await initializeUser(userId);
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        activeSubscription: {
+          include: {
+            plan: true,
+          },
+        },
+      },
+    });
+
+    const [progress, lives, streak] = await Promise.all([
+      prisma.userProgress.findFirst({ where: { userId } }),
+      prisma.userLives.findUnique({ where: { userId } }),
+      prisma.userStreak.findUnique({ where: { userId } }),
     ]);
 
+    if (!progress) {
+      return NextResponse.json(
+        { error: "Progresso não encontrado" },
+        { status: 404 },
+      );
+    }
+
+    const plan = user?.activeSubscription?.plan;
+
+    let currentLives = lives?.lives ?? 0;
+
+    if (plan && !plan.isUnlimited) {
+      currentLives = calculateLives(
+        currentLives,
+        plan.maxLives ?? 5,
+        lives?.updatedAt ?? new Date(),
+      );
+
+      if (currentLives !== lives?.lives) {
+        await prisma.userLives.update({
+          where: { userId },
+          data: { lives: currentLives },
+        });
+      }
+    }
+
+    const xp = progress.xp;
+
+    //  recalcula level SEMPRE
+    const levelData = getLevelFromXp(xp);
+
+    if (levelData.level !== progress.level) {
+      await prisma.userProgress.update({
+        where: {
+          userId_courseId: {
+            userId,
+            courseId: progress.courseId,
+          },
+        },
+        data: {
+          level: levelData.level,
+        },
+      });
+
+      console.log("LEVEL SYNC:", {
+        old: progress.level,
+        new: levelData.level,
+      });
+    }
+
     return NextResponse.json({
-      xp: progress?.xp ?? 0,
-      level: progress?.level ?? 1,
-      lives: subscription?.plan.isUnlimited ? "∞" : (lives?.lives ?? 0),
+      xp,
+      level: levelData.level,
+      currentLevelXp: levelData.currentLevelXp,
+      xpToNextLevel: levelData.xpToNextLevel,
+
+      lives: plan?.isUnlimited ? "∞" : currentLives,
       streak: streak?.currentDays ?? 0,
 
-      // 🆕 PLANO
       plan: {
-        name: subscription?.plan.name ?? "FREE",
-        isUnlimited: subscription?.plan.isUnlimited ?? false,
+        name: plan?.name ?? "FREE",
+        isUnlimited: plan?.isUnlimited ?? false,
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("USER_ME_ERROR:", error);
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }

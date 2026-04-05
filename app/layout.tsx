@@ -44,11 +44,11 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col relative">
         <LanguageProvider>
-          {/* BOTÃO AQUI */}
+          {/* BOTÃO AQUI 
           <div className="absolute top-4 right-4 z-50">
             <LanguageToggleButton />
           </div>
-
+          */}
           {children}
         </LanguageProvider>
       </body>
