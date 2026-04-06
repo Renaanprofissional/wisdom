@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { getLevelFromXp } from "@/lib/level";
+import { calculateStreak } from "@/lib/streak";
 
 export async function POST(req: Request) {
   try {
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
       );
     }
 
-    //  busca lição
+    // 🔍 busca lição
     const lesson = await prisma.lesson.findUnique({
       where: { id: lessonId },
     });
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
       );
     }
 
-    //  progresso
+    // 📈 progresso
     const progress = await prisma.userProgress.findFirst({
       where: { userId },
     });
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
       );
     }
 
-    //  bloqueio por nível
+    // 🔒 bloqueio por nível
     if (lesson.level > progress.level) {
       return NextResponse.json(
         { error: "Lição bloqueada 🔒" },
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
       );
     }
 
-    //  assinatura + plano
+    // 💳 assinatura
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -79,13 +80,13 @@ export async function POST(req: Request) {
       where: { userId },
     });
 
-    // bloqueio por vida
+    // ❤️ bloqueio por vida
     if (!isUnlimited && (lives?.lives ?? 0) <= 0) {
       return NextResponse.json({ error: "Sem vidas 💔" }, { status: 403 });
     }
 
     const result = await prisma.$transaction(async (tx) => {
-      // 🔍 verifica se já completou
+      // 🔍 já completou?
       const existing = await tx.userLesson.findUnique({
         where: {
           userId_lessonId: {
@@ -99,7 +100,7 @@ export async function POST(req: Request) {
         throw new Error("LESSON_ALREADY_COMPLETED");
       }
 
-      //  XP + LEVEL
+      // ⭐ XP + LEVEL
       const newXp = progress.xp + lesson.xpReward;
       const levelData = getLevelFromXp(newXp);
 
@@ -119,7 +120,7 @@ export async function POST(req: Request) {
         },
       });
 
-      //  salva conclusão
+      // ✅ salva conclusão
       await tx.userLesson.upsert({
         where: {
           userId_lessonId: {
@@ -139,7 +140,40 @@ export async function POST(req: Request) {
         },
       });
 
-      // adiciona vida
+      // 🔥 STREAK (OFENSIVA)
+      const streak = await tx.userStreak.findUnique({
+        where: { userId },
+      });
+
+      const streakCalc = calculateStreak(streak?.lastStudyAt ?? null);
+
+      let newStreak = 1;
+
+      if (!streak) {
+        await tx.userStreak.create({
+          data: {
+            userId,
+            currentDays: 1,
+            lastStudyAt: new Date(),
+          },
+        });
+      } else {
+        newStreak = streakCalc.reset
+          ? 1
+          : streakCalc.increment
+            ? streak.currentDays + 1
+            : streak.currentDays;
+
+        await tx.userStreak.update({
+          where: { userId },
+          data: {
+            currentDays: newStreak,
+            lastStudyAt: new Date(),
+          },
+        });
+      }
+
+      // ❤️ adiciona vida
       if (!isUnlimited) {
         await tx.userLives.update({
           where: { userId },
@@ -157,13 +191,14 @@ export async function POST(req: Request) {
         level: levelData.level,
         currentLevelXp: levelData.currentLevelXp,
         xpToNextLevel: levelData.xpToNextLevel,
+        streak: newStreak, // 🔥 retorno da ofensiva
       };
     });
 
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("COMPLETE_LESSON_ERROR:", error);
-    //  erro controlado
+
     if (error.message === "LESSON_ALREADY_COMPLETED") {
       return NextResponse.json(
         { error: "Lição já concluída" },

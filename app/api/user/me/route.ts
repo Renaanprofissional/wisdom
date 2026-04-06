@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { initializeUser } from "@/lib/init-user";
 import { calculateLives } from "@/lib/lives";
 import { getLevelFromXp } from "@/lib/level";
+import { calculateStreak } from "@/lib/streak";
 
 export async function GET(req: Request) {
   try {
@@ -86,6 +87,18 @@ export async function GET(req: Request) {
       });
     }
 
+    let displayStreak = 0;
+
+    if (streak) {
+      const streakCalc = calculateStreak(streak.lastStudyAt);
+
+      if (streakCalc.reset) {
+        displayStreak = 0;
+      } else {
+        displayStreak = streak.currentDays;
+      }
+    }
+
     return NextResponse.json({
       xp,
       level: levelData.level,
@@ -93,7 +106,7 @@ export async function GET(req: Request) {
       xpToNextLevel: levelData.xpToNextLevel,
 
       lives: plan?.isUnlimited ? "∞" : currentLives,
-      streak: streak?.currentDays ?? 0,
+      streak: displayStreak,
 
       plan: {
         name: plan?.name ?? "FREE",
