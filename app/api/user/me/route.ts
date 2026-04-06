@@ -28,11 +28,31 @@ export async function GET(req: Request) {
             plan: true,
           },
         },
+        activeCourse: {
+          include: {
+            sourceLanguage: true,
+            targetLanguage: true,
+          },
+        },
       },
     });
 
+    // 🔥 NOVO: garante que existe curso selecionado
+    if (!user?.activeCourseId) {
+      return NextResponse.json({
+        activeCourse: null,
+      });
+    }
+
     const [progress, lives, streak] = await Promise.all([
-      prisma.userProgress.findFirst({ where: { userId } }),
+      prisma.userProgress.findUnique({
+        where: {
+          userId_courseId: {
+            userId,
+            courseId: user.activeCourseId,
+          },
+        },
+      }),
       prisma.userLives.findUnique({ where: { userId } }),
       prisma.userStreak.findUnique({ where: { userId } }),
     ]);
@@ -65,7 +85,6 @@ export async function GET(req: Request) {
 
     const xp = progress.xp;
 
-    //  recalcula level SEMPRE
     const levelData = getLevelFromXp(xp);
 
     if (levelData.level !== progress.level) {
@@ -112,6 +131,8 @@ export async function GET(req: Request) {
         name: plan?.name ?? "FREE",
         isUnlimited: plan?.isUnlimited ?? false,
       },
+
+      activeCourse: user.activeCourse,
     });
   } catch (error) {
     console.error("USER_ME_ERROR:", error);

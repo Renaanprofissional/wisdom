@@ -33,6 +33,9 @@ model User {
   activeSubscriptionId String?
   activeSubscription   Subscription? @relation("ActiveSubscription", fields: [activeSubscriptionId], references: [id])
 
+  activeCourseId String?
+  activeCourse Course? @relation("ActiveCourse", fields: [activeCourseId], references: [id])
+
   progresses    UserProgress[]
   lessons       UserLesson[]
   achievements  UserAchievement[]
@@ -129,6 +132,7 @@ model Course {
 
   lessons    Lesson[]
   progresses UserProgress[]
+  activeUsers User[] @relation("ActiveCourse")
 
   @@unique([sourceLanguageId, targetLanguageId])
   @@map("course")

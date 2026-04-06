@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { FaFire, FaHeart } from "react-icons/fa";
+import { FaFire, FaHeart, FaSignOutAlt, FaExchangeAlt } from "react-icons/fa";
 import { GiBatwingEmblem } from "react-icons/gi";
 import { BsStars } from "react-icons/bs";
 
@@ -22,6 +22,7 @@ type Stats = {
     name: string;
     isUnlimited: boolean;
   };
+  activeCourse?: any;
 };
 
 type Lesson = {
@@ -92,7 +93,8 @@ export default function DashboardPage() {
   }, [session, fetchStats]);
 
   useEffect(() => {
-    if (stats) fetchLessons();
+    if (stats?.activeCourse) fetchLessons();
+    else setLoading(false);
   }, [stats, fetchLessons]);
 
   useEffect(() => {
@@ -126,6 +128,16 @@ export default function DashboardPage() {
     toast.success("Sessão encerrada");
   };
 
+  const handleChangeCourse = async () => {
+    await fetch("/api/course/select", {
+      method: "POST",
+      body: JSON.stringify({ courseId: null }),
+    });
+
+    toast.info("Selecione um novo curso");
+    fetchStats();
+  };
+
   if (isPending || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#050505] text-orange-400 text-lg animate-pulse">
@@ -138,6 +150,10 @@ export default function DashboardPage() {
 
   const { user } = session;
 
+  if (!stats.activeCourse) {
+    return <CourseSelector onSelect={fetchStats} />;
+  }
+
   const progress =
     stats.xpToNextLevel && stats.currentLevelXp !== undefined
       ? (stats.currentLevelXp / stats.xpToNextLevel) * 100
@@ -145,7 +161,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col pb-20">
-      {/* HEADER */}
       <header className="bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-orange-500/10 px-6 py-4 flex justify-between items-center shadow-lg">
         <h1 className="font-bold text-xl tracking-wide bg-linear-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
           Wisdom
@@ -160,18 +175,23 @@ export default function DashboardPage() {
           </div>
 
           <button
-            onClick={handleLogout}
-            className="text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 transition px-4 py-1.5 rounded-lg border border-orange-500/20"
+            onClick={handleChangeCourse}
+            className="text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 transition px-3 py-1.5 rounded-lg border border-orange-500/20 flex items-center gap-2"
           >
-            Sair
+            <FaExchangeAlt />
+            curso
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 transition px-4 py-1.5 rounded-lg border border-orange-500/20 flex items-center gap-2"
+          >
+            <FaSignOutAlt />
           </button>
         </div>
       </header>
 
-      {/* MAIN */}
-
       <main className="flex-1 max-w-2xl w-full mx-auto p-6 space-y-10">
-        {/* STATS */}
         <div className="grid grid-cols-4 gap-4">
           <Stat label={<BsStars />} value={stats.xp} />
           <Stat label={<GiBatwingEmblem />} value={stats.level} />
@@ -182,7 +202,6 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* PROGRESS BAR */}
         <div className="w-full bg-[#111] rounded-full h-3 overflow-hidden shadow-inner">
           <div
             className="bg-linear-to-r from-orange-400 via-orange-500 to-amber-500 h-full transition-all duration-500"
@@ -190,14 +209,12 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* BLOQUEIO */}
         {isBlocked && (
           <div className="bg-orange-500/10 border border-orange-500/30 p-4 rounded-xl text-center text-sm backdrop-blur-md shadow-md text-orange-300">
             Sem vidas 😢 Volte mais tarde ou vire PRO
           </div>
         )}
 
-        {/* 🔥 MAPA (DUOLINGO STYLE RESTAURADO) */}
         <div className="flex flex-col items-center gap-8 mt-10">
           {lessons.map((lesson, index) => {
             const isCurrent = lesson.level === stats.level;
@@ -251,8 +268,43 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* 🔥 BOTTOM MENU */}
       <NavMenu />
+    </div>
+  );
+}
+
+function CourseSelector({ onSelect }: { onSelect: () => void }) {
+  const [courses, setCourses] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/course")
+      .then((res) => res.json())
+      .then(setCourses);
+  }, []);
+
+  const handleSelect = async (courseId: string) => {
+    await fetch("/api/course/select", {
+      method: "POST",
+      body: JSON.stringify({ courseId }),
+    });
+
+    toast.success("Curso selecionado 🚀");
+    onSelect();
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] text-white gap-6">
+      <h1 className="text-2xl font-bold">Escolha seu curso</h1>
+
+      {courses.map((c) => (
+        <button
+          key={c.id}
+          onClick={() => handleSelect(c.id)}
+          className="px-6 py-3 bg-orange-500 rounded-xl"
+        >
+          {c.sourceLanguage.name} → {c.targetLanguage.name}
+        </button>
+      ))}
     </div>
   );
 }
@@ -265,29 +317,5 @@ function Stat({ label, value }: { label: React.ReactNode; value: any }) {
         {label}
       </span>
     </div>
-  );
-}
-
-function NavItem({
-  icon,
-  label,
-  active,
-  onClick,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex flex-col items-center text-xs transition ${
-        active ? "text-orange-400 scale-110" : "text-white/40 hover:text-white"
-      }`}
-    >
-      <div className="text-lg">{icon}</div>
-      <span>{label}</span>
-    </button>
   );
 }
