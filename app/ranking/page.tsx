@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FaFire, FaCrown } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
 import { GiBatwingEmblem } from "react-icons/gi";
+import { NavMenu } from "@/components/common/navMenu";
 
 type UserRank = {
   id: string;
@@ -59,19 +60,12 @@ export default function RankingPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-black via-[#050505] to-black text-white px-4 sm:px-6 py-6">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto mb-15">
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h1 className="text-2xl sm:text-4xl font-bold text-orange-400 flex items-center gap-2">
             🔥 Ranking Global
           </h1>
-
-          <button
-            onClick={() => router.push("/")}
-            className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-white/10 hover:bg-white/20 rounded-lg transition text-sm sm:text-base"
-          >
-            ⬅ Voltar
-          </button>
         </div>
 
         {/* SEARCH */}
@@ -185,6 +179,7 @@ export default function RankingPage() {
           })}
         </div>
       </div>
+      <NavMenu />
     </div>
   );
 }

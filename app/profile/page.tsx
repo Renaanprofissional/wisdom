@@ -7,6 +7,7 @@ import { FaFire, FaHeart } from "react-icons/fa";
 import { GiBatwingEmblem } from "react-icons/gi";
 import { BsStars } from "react-icons/bs";
 import { FiUser, FiArrowLeft, FiSettings } from "react-icons/fi";
+import { NavMenu } from "@/components/common/navMenu";
 
 type UserSession = {
   id: string;
@@ -78,7 +79,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white px-4 sm:px-6 py-6">
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-3xl mx-auto space-y-6 mb-15">
         <div className="bg-[#111] p-4 sm:p-6 rounded-2xl border border-orange-500/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-lg sm:text-xl">
@@ -116,13 +117,6 @@ export default function ProfilePage() {
                   <FiSettings />
                 </button>
               )}
-
-              <button
-                onClick={() => router.push("/")}
-                className="flex items-center gap-1 text-[10px] sm:text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 px-3 py-1 rounded-lg border border-orange-500/20"
-              >
-                <FiArrowLeft />
-              </button>
             </div>
           </div>
         </div>
@@ -164,6 +158,7 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+      <NavMenu />
     </div>
   );
 }
