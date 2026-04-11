@@ -154,10 +154,9 @@ export default function DashboardPage() {
     return <CourseSelector onSelect={fetchStats} />;
   }
 
-  const progress =
-    stats.xpToNextLevel && stats.currentLevelXp !== undefined
-      ? (stats.currentLevelXp / stats.xpToNextLevel) * 100
-      : 0;
+  //  PROGRESSO BASEADO EM LEVEL (até 300)
+  const MAX_LEVEL = 300;
+  const progress = Math.min((stats.level / MAX_LEVEL) * 100, 100);
 
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col pb-20">
@@ -202,11 +201,18 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="w-full bg-[#111] rounded-full h-3 overflow-hidden shadow-inner">
-          <div
-            className="bg-linear-to-r from-orange-400 via-orange-500 to-amber-500 h-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
+        {/*  BARRA DE PROGRESSO GLOBAL */}
+        <div>
+          <div className="w-full bg-[#111] rounded-full h-3 overflow-hidden shadow-inner">
+            <div
+              className="bg-linear-to-r from-orange-400 via-orange-500 to-amber-500 h-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <p className="text-xs text-orange-400/70 mt-2 text-center">
+            Level {stats.level}
+          </p>
         </div>
 
         {isBlocked && (

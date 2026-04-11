@@ -18,15 +18,14 @@ export async function GET(req: Request) {
 
     const userId = session.user.id;
 
+    // garante estrutura inicial do usuário
     await initializeUser(userId);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
         activeSubscription: {
-          include: {
-            plan: true,
-          },
+          include: { plan: true },
         },
         activeCourse: {
           include: {
@@ -37,68 +36,77 @@ export async function GET(req: Request) {
       },
     });
 
+    if (!user) {
+      return NextResponse.json(
+        { error: "Usuário não encontrado" },
+        { status: 404 },
+      );
+    }
+
     //  sem curso selecionado
-    if (!user?.activeCourseId) {
+    if (!user.activeCourseId) {
       return NextResponse.json({
         activeCourse: null,
       });
     }
 
-    //  BUSCA OU CRIA PROGRESSO
-    let progress = await prisma.userProgress.findUnique({
+    const courseId = user.activeCourseId;
+
+    //  garante progresso
+    let progress = await prisma.userProgress.upsert({
       where: {
         userId_courseId: {
           userId,
-          courseId: user.activeCourseId,
+          courseId,
         },
+      },
+      update: {},
+      create: {
+        userId,
+        courseId,
+        xp: 0,
+        level: 1,
       },
     });
 
-    if (!progress) {
-      progress = await prisma.userProgress.create({
-        data: {
-          userId,
-          courseId: user.activeCourseId,
-          xp: 0,
-          level: 1,
-        },
-      });
-    }
-
+    //  paraleliza queries
     const [lives, streak] = await Promise.all([
       prisma.userLives.findUnique({ where: { userId } }),
       prisma.userStreak.findUnique({ where: { userId } }),
     ]);
 
-    const plan = user?.activeSubscription?.plan;
+    const plan = user.activeSubscription?.plan;
 
     let currentLives = lives?.lives ?? 0;
 
+    //  recalcula vidas corretamente
     if (plan && !plan.isUnlimited) {
-      currentLives = calculateLives(
+      const recalculatedLives = calculateLives(
         currentLives,
         plan.maxLives ?? 5,
         lives?.updatedAt ?? new Date(),
       );
 
-      if (currentLives !== lives?.lives) {
+      if (recalculatedLives !== currentLives) {
         await prisma.userLives.update({
           where: { userId },
-          data: { lives: currentLives },
+          data: { lives: recalculatedLives },
         });
+
+        currentLives = recalculatedLives;
       }
     }
 
+    //  XP
     const xp = progress.xp;
     const levelData = getLevelFromXp(xp);
 
-    //  sincroniza level
     if (levelData.level !== progress.level) {
-      await prisma.userProgress.update({
+      progress = await prisma.userProgress.update({
         where: {
           userId_courseId: {
             userId,
-            courseId: progress.courseId,
+            courseId,
           },
         },
         data: {
@@ -107,6 +115,7 @@ export async function GET(req: Request) {
       });
     }
 
+    //  streak
     let displayStreak = 0;
 
     if (streak) {
@@ -121,6 +130,7 @@ export async function GET(req: Request) {
       xpToNextLevel: levelData.xpToNextLevel,
 
       lives: plan?.isUnlimited ? "∞" : currentLives,
+
       streak: displayStreak,
 
       plan: {
@@ -132,6 +142,7 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("USER_ME_ERROR:", error);
+
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }

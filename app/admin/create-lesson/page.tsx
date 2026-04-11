@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function CreateLessonPage() {
   const { data: session, isPending } = authClient.useSession();
@@ -125,6 +126,12 @@ export default function CreateLessonPage() {
 
   return (
     <div className="min-h-screen bg-[#05070F] text-white p-6 space-y-10">
+      <div>
+        <Link href="/admin" className="p-2 rounded hover:bg-white/10">
+          voltar
+        </Link>
+      </div>
+
       {/* FORM */}
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="text-2xl font-bold text-center">Criar Nova Lição</h1>
@@ -136,7 +143,6 @@ export default function CreateLessonPage() {
           className="w-full p-2 bg-black/50 rounded"
         />
 
-        {/* 🔥 SELECT MELHORADO */}
         <select
           value={selectedCourseId}
           onChange={(e) => setSelectedCourseId(e.target.value)}
@@ -230,7 +236,7 @@ export default function CreateLessonPage() {
         </button>
       </div>
 
-      {/* 📚 LISTA MELHORADA */}
+      {/* LISTA MELHORADA */}
       <div className="max-w-2xl mx-auto space-y-4">
         <h2 className="text-xl font-bold">📚 Lições</h2>
 
@@ -246,7 +252,7 @@ export default function CreateLessonPage() {
                 Nível {lesson.level} • {lesson.questions.length} perguntas
               </p>
 
-              {/* 🔥 MOSTRAR CURSO */}
+              {/* MOSTRAR CURSO */}
               <p className="text-xs text-blue-400">
                 {lesson.course?.sourceLanguage?.name} →{" "}
                 {lesson.course?.targetLanguage?.name}

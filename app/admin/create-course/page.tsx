@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function CreateCoursePage() {
   const router = useRouter();
@@ -111,6 +112,11 @@ export default function CreateCoursePage() {
   return (
     <div className="min-h-screen bg-[#05070F] text-white flex items-center justify-center">
       <div className="bg-white/5 p-6 rounded-xl w-full max-w-md space-y-6">
+        <div>
+          <Link href="/admin" className="p-2 rounded hover:bg-white/10">
+            voltar
+          </Link>
+        </div>
         <h1 className="text-xl font-bold text-center">Criar Curso</h1>
 
         {/*  CRIAR IDIOMA */}
