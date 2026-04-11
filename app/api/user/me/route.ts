@@ -37,32 +37,38 @@ export async function GET(req: Request) {
       },
     });
 
-    // 🔥 NOVO: garante que existe curso selecionado
+    //  sem curso selecionado
     if (!user?.activeCourseId) {
       return NextResponse.json({
         activeCourse: null,
       });
     }
 
-    const [progress, lives, streak] = await Promise.all([
-      prisma.userProgress.findUnique({
-        where: {
-          userId_courseId: {
-            userId,
-            courseId: user.activeCourseId,
-          },
+    //  BUSCA OU CRIA PROGRESSO
+    let progress = await prisma.userProgress.findUnique({
+      where: {
+        userId_courseId: {
+          userId,
+          courseId: user.activeCourseId,
         },
-      }),
+      },
+    });
+
+    if (!progress) {
+      progress = await prisma.userProgress.create({
+        data: {
+          userId,
+          courseId: user.activeCourseId,
+          xp: 0,
+          level: 1,
+        },
+      });
+    }
+
+    const [lives, streak] = await Promise.all([
       prisma.userLives.findUnique({ where: { userId } }),
       prisma.userStreak.findUnique({ where: { userId } }),
     ]);
-
-    if (!progress) {
-      return NextResponse.json(
-        { error: "Progresso não encontrado" },
-        { status: 404 },
-      );
-    }
 
     const plan = user?.activeSubscription?.plan;
 
@@ -84,9 +90,9 @@ export async function GET(req: Request) {
     }
 
     const xp = progress.xp;
-
     const levelData = getLevelFromXp(xp);
 
+    //  sincroniza level
     if (levelData.level !== progress.level) {
       await prisma.userProgress.update({
         where: {
@@ -99,23 +105,13 @@ export async function GET(req: Request) {
           level: levelData.level,
         },
       });
-
-      console.log("LEVEL SYNC:", {
-        old: progress.level,
-        new: levelData.level,
-      });
     }
 
     let displayStreak = 0;
 
     if (streak) {
       const streakCalc = calculateStreak(streak.lastStudyAt);
-
-      if (streakCalc.reset) {
-        displayStreak = 0;
-      } else {
-        displayStreak = streak.currentDays;
-      }
+      displayStreak = streakCalc.reset ? 0 : streak.currentDays;
     }
 
     return NextResponse.json({

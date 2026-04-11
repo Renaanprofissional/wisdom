@@ -26,10 +26,8 @@ model User {
 
   role          UserRole @default(USER)
 
-  //  (todas subscriptions)
   subscriptions Subscription[] @relation("UserSubscriptions")
 
-  //  (ativa)
   activeSubscriptionId String?
   activeSubscription   Subscription? @relation("ActiveSubscription", fields: [activeSubscriptionId], references: [id])
 
@@ -116,6 +114,9 @@ model Language {
   code String @unique
   name String
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   sourceCourses Course[] @relation("SourceLanguage")
   targetCourses Course[] @relation("TargetLanguage")
 
@@ -126,6 +127,9 @@ model Course {
   id               String @id @default(uuid())
   sourceLanguageId String
   targetLanguageId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   sourceLanguage Language @relation("SourceLanguage", fields: [sourceLanguageId], references: [id])
   targetLanguage Language @relation("TargetLanguage", fields: [targetLanguageId], references: [id])
@@ -154,11 +158,13 @@ model Lesson {
 
   xpReward Int
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   course Course @relation(fields: [courseId], references: [id])
 
   users   UserLesson[]
   reviews ReviewItem[]
-
 
   questions Question[]
 
@@ -187,6 +193,9 @@ model UserLesson {
   userId   String
   lessonId String
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   completed   Boolean   @default(false)
   completedAt DateTime?
 
@@ -209,6 +218,9 @@ model UserProgress {
   xp    Int @default(0)
   level Int @default(1)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   completedLessons Int @default(0)
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -226,6 +238,8 @@ model UserLives {
   id        String   @id @default(uuid())
   userId    String   @unique
   lives     Int
+
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -239,6 +253,9 @@ model UserStreak {
 
   currentDays Int       @default(0)
   lastStudyAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -255,6 +272,9 @@ model Plan {
   maxLives    Int?
   isUnlimited Boolean @default(false)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   subscriptions Subscription[]
 
   @@map("plan")
@@ -267,6 +287,9 @@ model Subscription {
 
   startedAt DateTime  @default(now())
   expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User @relation("UserSubscriptions", fields: [userId], references: [id], onDelete: Cascade)
   plan Plan @relation(fields: [planId], references: [id])
@@ -286,6 +309,9 @@ model Achievement {
   description String
   xpReward    Int
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   users UserAchievement[]
 
   @@map("achievement")
@@ -295,6 +321,9 @@ model UserAchievement {
   id            String @id @default(uuid())
   userId        String
   achievementId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   unlockedAt DateTime @default(now())
 
@@ -318,6 +347,9 @@ model ReviewItem {
   interval   Int
   easeFactor Float
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   lesson Lesson @relation(fields: [lessonId], references: [id])
 
@@ -334,6 +366,9 @@ model Leaderboard {
   week Int
   year Int
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   entries LeaderboardEntry[]
 
   @@map("leaderboard")
@@ -346,6 +381,9 @@ model LeaderboardEntry {
 
   xp Int
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   leaderboard Leaderboard @relation(fields: [leaderboardId], references: [id])
   user        User        @relation(fields: [userId], references: [id])
 
@@ -354,7 +392,7 @@ model LeaderboardEntry {
 }
 
 //////////////////////////
-// QUESTIONS SYSTEM (NOVO)
+// QUESTIONS SYSTEM
 //////////////////////////
 
 model Question {
@@ -363,6 +401,9 @@ model Question {
 
   question  String
   order     Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
@@ -377,6 +418,9 @@ model AnswerOption {
 
   text      String
   isCorrect Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 

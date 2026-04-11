@@ -13,7 +13,7 @@ export default function AdminPage() {
   const [plan, setPlan] = useState("PRO");
   const [loading, setLoading] = useState(false);
 
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null); // 🔥 importante
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (isPending) return;
