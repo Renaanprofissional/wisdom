@@ -58,7 +58,7 @@ export default function RankingPage() {
   const rest = filteredUsers.slice(3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-[#050505] to-black text-white px-4 sm:px-6 py-6">
+    <div className="min-h-screen bg-linear-to-b from-black via-[#050505] to-black text-white px-4 sm:px-6 py-6">
       <div className="max-w-5xl mx-auto">
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
