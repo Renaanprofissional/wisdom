@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { authClient } from "@/lib/auth-client";
+import {
+  FiArrowLeft,
+  FiPlus,
+  FiTrash2,
+  FiCheckCircle,
+  FiSave,
+  FiEdit3,
+} from "react-icons/fi";
+import Link from "next/link";
 
 export default function EditLessonPage() {
   const params = useParams();
@@ -18,7 +27,6 @@ export default function EditLessonPage() {
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // carregar lição
   useEffect(() => {
     if (!session?.user || !id) return;
 
@@ -52,7 +60,6 @@ export default function EditLessonPage() {
     fetchLesson();
   }, [session?.user?.id, id]);
 
-  //  ADD QUESTION
   const addQuestion = () => {
     setQuestions((prev) => [
       ...prev,
@@ -66,7 +73,6 @@ export default function EditLessonPage() {
     ]);
   };
 
-  //  ADD OPTION
   const addOption = (qIndex: number) => {
     setQuestions((prev) => {
       const updated = [...prev];
@@ -75,12 +81,10 @@ export default function EditLessonPage() {
     });
   };
 
-  //  REMOVE QUESTION
   const removeQuestion = (qIndex: number) => {
     setQuestions((prev) => prev.filter((_, i) => i !== qIndex));
   };
 
-  //  REMOVE OPTION
   const removeOption = (qIndex: number, oIndex: number) => {
     setQuestions((prev) => {
       const updated = [...prev];
@@ -91,7 +95,6 @@ export default function EditLessonPage() {
     });
   };
 
-  //  salvar
   const handleUpdate = async () => {
     try {
       setLoading(true);
@@ -120,16 +123,30 @@ export default function EditLessonPage() {
   };
 
   if (isPending) {
-    return <div className="text-white text-center mt-20">Carregando...</div>;
+    return (
+      <div className="text-orange-400 text-center mt-20 animate-pulse text-lg">
+        Carregando...
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-[#05070F] text-white p-6">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-2xl font-bold text-center">Editar Lição</h1>
+    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white p-6 space-y-10">
+      <div>
+        <Link
+          href="/admin"
+          className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition font-medium"
+        >
+          <FiArrowLeft /> Voltar
+        </Link>
+      </div>
 
-        {/* guia */}
-        <div className="bg-white/5 p-4 rounded-xl text-sm text-white/70">
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#111] border border-orange-500/10 p-8 rounded-2xl shadow-[0_0_40px_rgba(255,115,0,0.08)]">
+        <h1 className="text-3xl font-bold text-center bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
+          <FiEdit3 /> Editar Lição
+        </h1>
+
+        <div className="bg-black/40 border border-orange-500/10 p-4 rounded-xl text-sm text-gray-400 space-y-1">
           <p>• Edite título, XP e perguntas</p>
           <p>• Adicione novas perguntas se quiser</p>
           <p>• Apenas 1 resposta correta por pergunta</p>
@@ -139,43 +156,49 @@ export default function EditLessonPage() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Título"
-          className="w-full p-2 bg-black/50 rounded"
+          className="w-full p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/30"
         />
 
-        <input
-          type="number"
-          value={xp}
-          onChange={(e) => setXp(Number(e.target.value))}
-          placeholder="XP"
-          className="w-full p-2 bg-black/50 rounded"
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            type="number"
+            value={xp}
+            onChange={(e) => setXp(Number(e.target.value))}
+            placeholder="XP"
+            className="p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
+          />
 
-        <input
-          type="number"
-          value={level}
-          onChange={(e) => setLevel(Number(e.target.value))}
-          placeholder="Level"
-          className="w-full p-2 bg-black/50 rounded"
-        />
+          <input
+            type="number"
+            value={level}
+            onChange={(e) => setLevel(Number(e.target.value))}
+            placeholder="Level"
+            className="p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
+          />
+        </div>
 
-        {/*  ADD QUESTION */}
-        <button onClick={addQuestion} className="bg-blue-500 px-4 py-2 rounded">
-          + Adicionar Pergunta
+        <button
+          onClick={addQuestion}
+          className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 px-4 py-3 rounded-lg transition font-semibold shadow"
+        >
+          <FiPlus /> Adicionar Pergunta
         </button>
 
-        {/*  QUESTIONS */}
         {questions.map((q, qIndex) => (
-          <div key={qIndex} className="bg-white/5 p-4 rounded space-y-3">
+          <div
+            key={qIndex}
+            className="bg-black/40 border border-orange-500/10 p-5 rounded-xl space-y-3 hover:border-orange-500/30 transition"
+          >
             <div className="flex justify-between items-center">
-              <span className="text-sm text-white/60">
+              <span className="text-sm text-gray-400">
                 Pergunta {qIndex + 1}
               </span>
 
               <button
                 onClick={() => removeQuestion(qIndex)}
-                className="text-red-400 text-sm"
+                className="flex items-center gap-1 text-red-400 hover:text-red-300 text-sm"
               >
-                Remover
+                <FiTrash2 /> Remover
               </button>
             </div>
 
@@ -187,10 +210,9 @@ export default function EditLessonPage() {
                 setQuestions(updated);
               }}
               placeholder="Pergunta"
-              className="w-full p-2 bg-black/50 rounded"
+              className="w-full p-3 bg-black/50 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
             />
 
-            {/* OPTIONS */}
             {q.options.map((opt: any, oIndex: number) => (
               <div key={oIndex} className="flex gap-2 items-center">
                 <input
@@ -201,38 +223,41 @@ export default function EditLessonPage() {
                     setQuestions(updated);
                   }}
                   placeholder="Opção"
-                  className="flex-1 p-2 bg-black/50 rounded"
+                  className="flex-1 p-2 bg-black/50 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
                 />
 
-                <input
-                  type="checkbox"
-                  checked={opt.isCorrect}
-                  onChange={() => {
+                <button
+                  onClick={() => {
                     const updated = [...questions];
-
                     updated[qIndex].options = updated[qIndex].options.map(
                       (o: any, i: number) => ({
                         ...o,
                         isCorrect: i === oIndex,
                       }),
                     );
-
                     setQuestions(updated);
                   }}
-                />
+                  className={`p-2 rounded-md transition ${
+                    opt.isCorrect
+                      ? "bg-green-500 text-white shadow"
+                      : "bg-white/10 text-gray-400 hover:bg-white/20"
+                  }`}
+                >
+                  <FiCheckCircle />
+                </button>
 
                 <button
                   onClick={() => removeOption(qIndex, oIndex)}
-                  className="text-red-400"
+                  className="text-red-400 hover:text-red-300"
                 >
-                  X
+                  <FiTrash2 />
                 </button>
               </div>
             ))}
 
             <button
               onClick={() => addOption(qIndex)}
-              className="text-green-400 text-sm"
+              className="text-orange-400 text-sm hover:text-orange-300 transition"
             >
               + adicionar opção
             </button>
@@ -242,8 +267,9 @@ export default function EditLessonPage() {
         <button
           onClick={handleUpdate}
           disabled={loading}
-          className="w-full bg-green-500 py-3 rounded font-bold"
+          className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-orange-500 to-orange-600 py-3 rounded-lg font-bold hover:opacity-90 transition shadow-lg"
         >
+          <FiSave />
           {loading ? "Salvando..." : "Salvar alterações"}
         </button>
       </div>

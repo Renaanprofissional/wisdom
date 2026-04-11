@@ -5,6 +5,15 @@ import { toast } from "react-toastify";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  FiArrowLeft,
+  FiPlus,
+  FiEdit,
+  FiCheckCircle,
+  FiBookOpen,
+  FiAward,
+  FiLayers,
+} from "react-icons/fi";
 
 export default function CreateLessonPage() {
   const { data: session, isPending } = authClient.useSession();
@@ -119,79 +128,100 @@ export default function CreateLessonPage() {
   };
 
   if (isPending || isAdmin === null) {
-    return <div className="text-white text-center mt-20">Carregando...</div>;
+    return (
+      <div className="text-orange-400 text-center mt-20 animate-pulse text-lg">
+        Carregando...
+      </div>
+    );
   }
 
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-[#05070F] text-white p-6 space-y-10">
+    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white p-6 space-y-12">
       <div>
-        <Link href="/admin" className="p-2 rounded hover:bg-white/10">
-          voltar
+        <Link
+          href="/admin"
+          className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition font-medium"
+        >
+          <FiArrowLeft /> Voltar
         </Link>
       </div>
 
-      {/* FORM */}
-      <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-2xl font-bold text-center">Criar Nova Lição</h1>
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#111] border border-orange-500/10 p-8 rounded-2xl shadow-[0_0_40px_rgba(255,115,0,0.08)]">
+        <h1 className="text-3xl font-bold text-center bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
+          <FiBookOpen /> Criar Nova Lição
+        </h1>
 
         <input
           placeholder="Título da lição"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 bg-black/50 rounded"
+          className="w-full p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/30 transition"
         />
 
         <select
           value={selectedCourseId}
           onChange={(e) => setSelectedCourseId(e.target.value)}
-          className="w-full p-2 bg-black/50 rounded"
+          className="w-full p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
         >
           <option value="">Selecione um curso</option>
           {courses.map((course) => (
             <option key={course.id} value={course.id}>
-              {course.sourceLanguage?.name} → {course.targetLanguage?.name} (
-              {course.sourceLanguage?.code} → {course.targetLanguage?.code})
+              {course.sourceLanguage?.name} → {course.targetLanguage?.name}
             </option>
           ))}
         </select>
 
-        <input
-          type="number"
-          placeholder="XP"
-          value={xp}
-          onChange={(e) => setXp(Number(e.target.value))}
-          className="w-full p-2 bg-black/50 rounded"
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-2 bg-black/40 border border-orange-500/20 rounded-lg px-3">
+            <FiAward className="text-orange-400" />
+            <input
+              type="number"
+              placeholder="XP"
+              value={xp}
+              onChange={(e) => setXp(Number(e.target.value))}
+              className="w-full bg-transparent p-3 focus:outline-none"
+            />
+          </div>
 
-        <input
-          type="number"
-          placeholder="Nível"
-          value={level}
-          onChange={(e) => setLevel(Number(e.target.value))}
-          className="w-full p-2 bg-black/50 rounded"
-        />
+          <div className="flex items-center gap-2 bg-black/40 border border-orange-500/20 rounded-lg px-3">
+            <FiLayers className="text-orange-400" />
+            <input
+              type="number"
+              placeholder="Nível"
+              value={level}
+              onChange={(e) => setLevel(Number(e.target.value))}
+              className="w-full bg-transparent p-3 focus:outline-none"
+            />
+          </div>
+        </div>
 
-        <button onClick={addQuestion} className="bg-blue-500 px-4 py-2 rounded">
-          + Pergunta
+        <button
+          onClick={addQuestion}
+          className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 active:scale-[0.98] transition px-4 py-3 rounded-lg font-semibold shadow-md"
+        >
+          <FiPlus /> Adicionar Pergunta
         </button>
 
         {questions.map((q, qIndex) => (
-          <div key={qIndex} className="bg-white/5 p-4 rounded space-y-2">
+          <div
+            key={qIndex}
+            className="bg-black/40 border border-orange-500/10 p-5 rounded-xl space-y-3 hover:border-orange-500/30 transition"
+          >
             <input
-              placeholder="Pergunta"
+              placeholder={`Pergunta ${qIndex + 1}`}
               value={q.question}
               onChange={(e) => {
                 const updated = [...questions];
                 updated[qIndex].question = e.target.value;
                 setQuestions(updated);
               }}
-              className="w-full p-2 bg-black/50 rounded"
+              className="w-full p-3 bg-black/50 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
             />
 
             {q.options.map((opt: any, oIndex: number) => (
-              <div key={oIndex} className="flex gap-2">
+              <div key={oIndex} className="flex gap-2 items-center">
                 <input
                   value={opt.text}
                   onChange={(e) => {
@@ -199,13 +229,11 @@ export default function CreateLessonPage() {
                     updated[qIndex].options[oIndex].text = e.target.value;
                     setQuestions(updated);
                   }}
-                  className="flex-1 p-2 bg-black/50 rounded"
+                  className="flex-1 p-2 bg-black/50 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
                 />
 
-                <input
-                  type="checkbox"
-                  checked={opt.isCorrect}
-                  onChange={() => {
+                <button
+                  onClick={() => {
                     const updated = [...questions];
                     updated[qIndex].options = updated[qIndex].options.map(
                       (o: any, i: number) => ({
@@ -215,45 +243,52 @@ export default function CreateLessonPage() {
                     );
                     setQuestions(updated);
                   }}
-                />
+                  className={`p-2 rounded-md transition ${
+                    opt.isCorrect
+                      ? "bg-green-500 text-white shadow"
+                      : "bg-white/10 text-gray-400 hover:bg-white/20"
+                  }`}
+                >
+                  <FiCheckCircle />
+                </button>
               </div>
             ))}
 
             <button
               onClick={() => addOption(qIndex)}
-              className="text-green-400 text-sm"
+              className="text-orange-400 text-sm hover:text-orange-300 transition"
             >
-              + opção
+              + adicionar opção
             </button>
           </div>
         ))}
 
         <button
           onClick={handleSubmit}
-          className="w-full bg-green-500 py-3 rounded font-bold"
+          className="w-full bg-linear-to-r from-orange-500 to-orange-600 py-3 rounded-lg font-bold hover:opacity-90 active:scale-[0.99] transition shadow-lg"
         >
-          Criar Lição
+          {loading ? "Criando..." : "Criar Lição"}
         </button>
       </div>
 
-      {/* LISTA MELHORADA */}
       <div className="max-w-2xl mx-auto space-y-4">
-        <h2 className="text-xl font-bold">📚 Lições</h2>
+        <h2 className="text-2xl font-bold text-orange-400 flex items-center gap-2">
+          <FiBookOpen /> Lições
+        </h2>
 
         {lessons.map((lesson) => (
           <div
             key={lesson.id}
-            className="bg-white/5 p-4 rounded flex justify-between"
+            className="bg-[#111] border border-orange-500/10 p-5 rounded-xl flex justify-between items-center hover:border-orange-500/40 hover:shadow-[0_0_20px_rgba(255,115,0,0.15)] transition"
           >
             <div>
-              <p className="font-bold">{lesson.title}</p>
+              <p className="font-bold text-lg">{lesson.title}</p>
 
-              <p className="text-sm text-white/60">
+              <p className="text-sm text-gray-400">
                 Nível {lesson.level} • {lesson.questions.length} perguntas
               </p>
 
-              {/* MOSTRAR CURSO */}
-              <p className="text-xs text-blue-400">
+              <p className="text-xs text-orange-400">
                 {lesson.course?.sourceLanguage?.name} →{" "}
                 {lesson.course?.targetLanguage?.name}
               </p>
@@ -261,9 +296,9 @@ export default function CreateLessonPage() {
 
             <button
               onClick={() => router.push(`/admin/edit-lesson/${lesson.id}`)}
-              className="bg-yellow-500 px-3 py-1 rounded"
+              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg transition shadow"
             >
-              Editar
+              <FiEdit /> Editar
             </button>
           </div>
         ))}

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { FaFire, FaHeart } from "react-icons/fa";
 import { GiBatwingEmblem } from "react-icons/gi";
 import { BsStars } from "react-icons/bs";
+import { FiUser, FiArrowLeft, FiSettings } from "react-icons/fi";
 
 type UserSession = {
   id: string;
@@ -70,7 +71,7 @@ export default function ProfilePage() {
 
   if (isPending || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050505] text-orange-400 animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-[#050505] text-orange-400 animate-pulse text-lg">
         Carregando perfil...
       </div>
     );
@@ -82,23 +83,29 @@ export default function ProfilePage() {
   const progress = ((data.xp % STEP) / STEP) * 100;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#05070F] to-[#0A0F1F] text-white p-6">
+    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white p-6">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* HEADER */}
-        <div className="bg-white/5 p-6 rounded-2xl border border-white/10 flex items-center justify-between backdrop-blur-xl">
-          <div>
-            <h1 className="text-2xl font-bold">{user.name}</h1>
-            <p className="text-sm text-white/60">{user.email}</p>
-            <p className="text-xs text-orange-400 mt-1">
-              Plano: {data.plan?.name}
-            </p>
+        <div className="bg-[#111] p-6 rounded-2xl border border-orange-500/10 flex items-center justify-between shadow-[0_0_40px_rgba(255,115,0,0.08)]">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xl">
+              <FiUser />
+            </div>
+
+            <div>
+              <h1 className="text-2xl font-bold">{user.name}</h1>
+              <p className="text-sm text-gray-400">{user.email}</p>
+              <p className="text-xs text-orange-400 mt-1">
+                Plano: {data.plan?.name}
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-col items-end gap-2">
             <span
               className={`px-3 py-1 rounded-full text-xs font-bold ${
                 user.role === "ADMIN"
-                  ? "bg-blue-500/20 text-blue-400"
+                  ? "bg-orange-500/20 text-orange-400 border border-orange-500/30"
                   : "bg-gray-500/20 text-gray-400"
               }`}
             >
@@ -106,21 +113,20 @@ export default function ProfilePage() {
             </span>
 
             <div className="flex gap-2">
-              {/* BOTÃO ADMIN */}
               {user.role === "ADMIN" && (
                 <button
                   onClick={() => router.push("/admin")}
-                  className="text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 px-3 py-1 rounded-lg border border-orange-500/20"
+                  className="flex items-center gap-1 text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 px-3 py-1 rounded-lg border border-orange-500/20 transition"
                 >
-                  gerenciar
+                  <FiSettings /> Gerenciar
                 </button>
               )}
 
               <button
                 onClick={() => router.push("/")}
-                className="text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 px-3 py-1 rounded-lg border border-orange-500/20"
+                className="flex items-center gap-1 text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 px-3 py-1 rounded-lg border border-orange-500/20 transition"
               >
-                Voltar
+                <FiArrowLeft /> Voltar
               </button>
             </div>
           </div>
@@ -128,33 +134,34 @@ export default function ProfilePage() {
 
         {/* STATS */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Stat label={<BsStars />} value={data.xp} />
-          <Stat label={<GiBatwingEmblem />} value={data.level} />
-          <Stat label={<FaFire />} value={data.streak} />
-          <Stat label={<FaHeart />} value={data.lives} />
+          <Stat icon={<BsStars />} value={data.xp} label="XP" />
+          <Stat icon={<GiBatwingEmblem />} value={data.level} label="Level" />
+          <Stat icon={<FaFire />} value={data.streak} label="Streak" />
+          <Stat icon={<FaHeart />} value={data.lives} label="Vidas" />
         </div>
 
         {/* PROGRESS */}
-        <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
-          <h2 className="font-bold mb-3">Progresso</h2>
+        <div className="bg-[#111] p-6 rounded-2xl border border-orange-500/10 shadow">
+          <h2 className="font-bold mb-3 text-orange-400">Progresso</h2>
 
-          <div className="w-full bg-white/10 rounded-full h-4 overflow-hidden">
+          <div className="w-full bg-black/40 rounded-full h-4 overflow-hidden">
             <div
-              className="h-full bg-linear-to-r from-orange-400 via-orange-500 to-amber-500 transition-all"
+              className="h-full bg-linear-to-r from-orange-400 via-orange-500 to-amber-500 transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
 
-          <p className="text-sm text-white/60 mt-2">
-            {data.xp % STEP} (XP atual)
+          <p className="text-sm text-gray-400 mt-2">
+            {data.xp % STEP} XP neste nível
           </p>
         </div>
 
         {/* CURSO */}
         {data.activeCourse && (
-          <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
-            <h2 className="font-bold mb-2">Curso Atual</h2>
-            <p className="text-white/80">
+          <div className="bg-[#111] p-6 rounded-2xl border border-orange-500/10 shadow">
+            <h2 className="font-bold mb-2 text-orange-400">Curso Atual</h2>
+
+            <p className="text-gray-300 text-lg">
               {data.activeCourse.sourceLanguage.name} →{" "}
               {data.activeCourse.targetLanguage.name}
             </p>
@@ -165,13 +172,22 @@ export default function ProfilePage() {
   );
 }
 
-function Stat({ label, value }: { label: React.ReactNode; value: any }) {
+function Stat({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  value: any;
+  label: string;
+}) {
   return (
-    <div className="bg-white/5 p-4 rounded-xl border border-white/10 text-center hover:scale-105 transition">
-      <p className="text-lg font-bold text-orange-400">{value}</p>
-      <span className="text-sm text-orange-400/60 flex justify-center mt-1">
-        {label}
-      </span>
+    <div className="bg-[#111] p-4 rounded-xl border border-orange-500/10 text-center hover:scale-105 hover:border-orange-500/30 transition shadow">
+      <div className="text-orange-400 text-xl flex justify-center mb-1">
+        {icon}
+      </div>
+      <p className="text-lg font-bold">{value}</p>
+      <span className="text-xs text-gray-400">{label}</span>
     </div>
   );
 }

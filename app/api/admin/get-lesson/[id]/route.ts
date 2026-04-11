@@ -22,7 +22,6 @@ export async function GET(
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
 
-    // 🔥 AQUI ESTÁ A CORREÇÃO
     const { id } = await context.params;
 
     const lesson = await prisma.lesson.findUnique({

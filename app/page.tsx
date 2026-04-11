@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { FaFire, FaHeart, FaSignOutAlt, FaExchangeAlt } from "react-icons/fa";
 import { GiBatwingEmblem } from "react-icons/gi";
 import { BsStars } from "react-icons/bs";
+import { FiZap } from "react-icons/fi";
 
 import { NavMenu } from "@/components/common/navMenu";
 
@@ -47,13 +48,9 @@ export default function DashboardPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const res = await fetch("/api/user/me", {
-        cache: "no-store",
-      });
+      const res = await fetch("/api/user/me", { cache: "no-store" });
 
-      if (!res.ok) {
-        throw new Error("Erro ao buscar stats");
-      }
+      if (!res.ok) throw new Error("Erro ao buscar stats");
 
       const data = await res.json();
 
@@ -71,13 +68,9 @@ export default function DashboardPage() {
 
   const fetchLessons = useCallback(async () => {
     try {
-      const res = await fetch("/api/lesson", {
-        cache: "no-store",
-      });
+      const res = await fetch("/api/lesson", { cache: "no-store" });
 
-      if (!res.ok) {
-        throw new Error("Erro ao buscar lições");
-      }
+      if (!res.ok) throw new Error("Erro ao buscar lições");
 
       const data = await res.json();
       setLessons(data);
@@ -111,12 +104,6 @@ export default function DashboardPage() {
 
     if (lesson.locked) {
       toast.warning("Lição bloqueada 🔒");
-      return;
-    }
-
-    if (lesson.completed) {
-      toast.info("Refazendo lição 🔁");
-      router.push(`/lesson/${lesson.id}`);
       return;
     }
 
@@ -154,20 +141,19 @@ export default function DashboardPage() {
     return <CourseSelector onSelect={fetchStats} />;
   }
 
-  //  PROGRESSO BASEADO EM LEVEL (até 300)
   const MAX_LEVEL = 300;
   const progress = Math.min((stats.level / MAX_LEVEL) * 100, 100);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col pb-20">
+    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white flex flex-col pb-20">
       <header className="bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-orange-500/10 px-6 py-4 flex justify-between items-center shadow-lg">
-        <h1 className="font-bold text-xl tracking-wide bg-linear-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
-          Wisdom
+        <h1 className="font-bold text-xl flex items-center gap-2 bg-linear-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
+          <FiZap /> Wisdom
         </h1>
 
         <div className="flex items-center gap-4">
           <div className="text-right leading-tight">
-            <p className="text-sm font-medium text-white">{user.name}</p>
+            <p className="text-sm font-medium">{user.name}</p>
             <p className="text-xs text-orange-400/70">
               {stats.plan?.name ?? "FREE"}
             </p>
@@ -175,7 +161,7 @@ export default function DashboardPage() {
 
           <button
             onClick={handleChangeCourse}
-            className="text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 transition px-3 py-1.5 rounded-lg border border-orange-500/20 flex items-center gap-2"
+            className="flex items-center gap-2 text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 transition px-3 py-1.5 rounded-lg border border-orange-500/20"
           >
             <FaExchangeAlt />
             curso
@@ -183,7 +169,7 @@ export default function DashboardPage() {
 
           <button
             onClick={handleLogout}
-            className="text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 transition px-4 py-1.5 rounded-lg border border-orange-500/20 flex items-center gap-2"
+            className="flex items-center gap-2 text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 transition px-4 py-1.5 rounded-lg border border-orange-500/20"
           >
             <FaSignOutAlt />
           </button>
@@ -192,16 +178,15 @@ export default function DashboardPage() {
 
       <main className="flex-1 max-w-2xl w-full mx-auto p-6 space-y-10">
         <div className="grid grid-cols-4 gap-4">
-          <Stat label={<BsStars />} value={stats.xp} />
-          <Stat label={<GiBatwingEmblem />} value={stats.level} />
-          <Stat label={<FaFire />} value={stats.streak} />
+          <Stat icon={<BsStars />} value={stats.xp} />
+          <Stat icon={<GiBatwingEmblem />} value={stats.level} />
+          <Stat icon={<FaFire />} value={stats.streak} />
           <Stat
-            label={<FaHeart />}
+            icon={<FaHeart />}
             value={stats.plan?.isUnlimited ? "∞" : stats.lives}
           />
         </div>
 
-        {/*  BARRA DE PROGRESSO GLOBAL */}
         <div>
           <div className="w-full bg-[#111] rounded-full h-3 overflow-hidden shadow-inner">
             <div
@@ -216,7 +201,7 @@ export default function DashboardPage() {
         </div>
 
         {isBlocked && (
-          <div className="bg-orange-500/10 border border-orange-500/30 p-4 rounded-xl text-center text-sm backdrop-blur-md shadow-md text-orange-300">
+          <div className="bg-orange-500/10 border border-orange-500/30 p-4 rounded-xl text-center text-sm backdrop-blur-md shadow text-orange-300">
             Sem vidas 😢 Volte mais tarde ou vire PRO
           </div>
         )}
@@ -228,7 +213,7 @@ export default function DashboardPage() {
             return (
               <div
                 key={lesson.id}
-                className={`flex flex-col items-center transition-all duration-300 ${
+                className={`flex flex-col items-center transition-all ${
                   index % 2 === 0 ? "translate-x-8" : "-translate-x-8"
                 }`}
               >
@@ -239,28 +224,20 @@ export default function DashboardPage() {
                 <button
                   onClick={() => handleLessonClick(lesson)}
                   disabled={lesson.locked || isBlocked}
-                  className={`
-              w-20 h-20 rounded-full flex items-center justify-center text-xl font-bold
-              transition-all duration-300
-              ${
-                lesson.locked
-                  ? "bg-[#1a1a1a] text-gray-500 cursor-not-allowed"
-                  : lesson.completed
-                    ? "bg-orange-500/70 ring-2 ring-orange-300 shadow-lg scale-95"
-                    : isCurrent
-                      ? "bg-linear-to-br from-orange-400 to-amber-500 hover:scale-110 shadow-[0_0_25px_rgba(255,140,0,0.7)]"
-                      : "bg-[#111] hover:bg-[#1a1a1a] border border-orange-500/10 hover:scale-105"
-              }
-            `}
+                  className={`w-20 h-20 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300 ${
+                    lesson.locked
+                      ? "bg-[#1a1a1a] text-gray-500 cursor-not-allowed"
+                      : lesson.completed
+                        ? "bg-orange-500/70 ring-2 ring-orange-300 shadow scale-95"
+                        : isCurrent
+                          ? "bg-linear-to-br from-orange-400 to-amber-500 hover:scale-110 shadow-[0_0_25px_rgba(255,140,0,0.7)]"
+                          : "bg-[#111] hover:bg-[#1a1a1a] border border-orange-500/10 hover:scale-105"
+                  }`}
                 >
-                  {lesson.locked
-                    ? "🔒"
-                    : lesson.completed
-                      ? "✅"
-                      : lesson.level}
+                  {lesson.locked ? "🔒" : lesson.completed ? "✓" : lesson.level}
                 </button>
 
-                <p className="text-xs text-center mt-2 max-w-[100px] leading-tight text-white/80">
+                <p className="text-xs text-center mt-2 max-w-[100px] text-gray-300">
                   {lesson.title}
                   {lesson.completed && (
                     <span className="block text-[10px] text-orange-400 mt-1">
@@ -300,13 +277,13 @@ function CourseSelector({ onSelect }: { onSelect: () => void }) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] text-white gap-6">
-      <h1 className="text-2xl font-bold">Escolha seu curso</h1>
+      <h1 className="text-2xl font-bold text-orange-400">Escolha seu curso</h1>
 
       {courses.map((c) => (
         <button
           key={c.id}
           onClick={() => handleSelect(c.id)}
-          className="px-6 py-3 bg-orange-500 rounded-xl"
+          className="px-6 py-3 bg-linear-to-r from-orange-500 to-orange-600 rounded-xl hover:scale-105 transition shadow"
         >
           {c.sourceLanguage.name} → {c.targetLanguage.name}
         </button>
@@ -315,13 +292,13 @@ function CourseSelector({ onSelect }: { onSelect: () => void }) {
   );
 }
 
-function Stat({ label, value }: { label: React.ReactNode; value: any }) {
+function Stat({ icon, value }: { icon: React.ReactNode; value: any }) {
   return (
-    <div className="bg-[#0f0f0f] p-4 rounded-2xl text-center border border-orange-500/10 shadow-md hover:scale-105 transition">
-      <p className="text-lg font-bold text-orange-400">{value}</p>
-      <span className="text-sm text-orange-400/60 flex justify-center mt-1">
-        {label}
-      </span>
+    <div className="bg-[#0f0f0f] p-4 rounded-2xl text-center border border-orange-500/10 shadow hover:scale-105 hover:border-orange-500/30 transition">
+      <div className="text-orange-400 text-lg flex justify-center mb-1">
+        {icon}
+      </div>
+      <p className="text-lg font-bold">{value}</p>
     </div>
   );
 }
