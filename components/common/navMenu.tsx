@@ -16,9 +16,9 @@ export function NavMenu() {
       />
       <ButtonMenu
         icon={<MdExplore />}
-        label="Explorar"
-        active={pathname === "/explore"}
-        onClick={() => router.push("/explore")}
+        label="Contato"
+        active={pathname === "/contato"}
+        onClick={() => router.push("/contato")}
       />
       <ButtonMenu
         icon={<FaFire />}
