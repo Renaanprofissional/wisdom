@@ -111,7 +111,6 @@ export default function EditLessonPage() {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error);
 
       toast.success("Lição atualizada 🚀");
@@ -124,48 +123,46 @@ export default function EditLessonPage() {
 
   if (isPending) {
     return (
-      <div className="text-orange-400 text-center mt-20 animate-pulse text-lg">
+      <div className="text-orange-400 text-center mt-20 animate-pulse px-4">
         Carregando...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white p-6 space-y-10">
-      <div>
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition font-medium"
-        >
-          <FiArrowLeft /> Voltar
-        </Link>
-      </div>
+    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white px-4 sm:px-6 py-6 space-y-8">
+      <Link
+        href="/admin"
+        className="inline-flex items-center gap-2 text-orange-400 text-sm sm:text-base"
+      >
+        <FiArrowLeft /> Voltar
+      </Link>
 
-      <div className="max-w-2xl mx-auto space-y-6 bg-[#111] border border-orange-500/10 p-8 rounded-2xl shadow-[0_0_40px_rgba(255,115,0,0.08)]">
-        <h1 className="text-3xl font-bold text-center bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#111] border border-orange-500/10 p-5 sm:p-8 rounded-2xl">
+        <h1 className="text-xl sm:text-3xl font-bold text-center bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
           <FiEdit3 /> Editar Lição
         </h1>
 
-        <div className="bg-black/40 border border-orange-500/10 p-4 rounded-xl text-sm text-gray-400 space-y-1">
-          <p>• Edite título, XP e perguntas</p>
-          <p>• Adicione novas perguntas se quiser</p>
-          <p>• Apenas 1 resposta correta por pergunta</p>
+        <div className="bg-black/40 border border-orange-500/10 p-3 sm:p-4 rounded-xl text-xs sm:text-sm text-gray-400 space-y-1">
+          <p>Edite título, XP e perguntas</p>
+          <p>Adicione novas perguntas se quiser</p>
+          <p>1 resposta correta por pergunta</p>
         </div>
 
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Título"
-          className="w-full p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/30"
+          className="w-full p-3 sm:p-4 bg-black/40 border border-orange-500/20 rounded-lg text-sm sm:text-base focus:outline-none"
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
             type="number"
             value={xp}
             onChange={(e) => setXp(Number(e.target.value))}
             placeholder="XP"
-            className="p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
+            className="p-3 sm:p-4 bg-black/40 border border-orange-500/20 rounded-lg text-sm sm:text-base"
           />
 
           <input
@@ -173,30 +170,30 @@ export default function EditLessonPage() {
             value={level}
             onChange={(e) => setLevel(Number(e.target.value))}
             placeholder="Level"
-            className="p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
+            className="p-3 sm:p-4 bg-black/40 border border-orange-500/20 rounded-lg text-sm sm:text-base"
           />
         </div>
 
         <button
           onClick={addQuestion}
-          className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 px-4 py-3 rounded-lg transition font-semibold shadow"
+          className="w-full flex items-center justify-center gap-2 bg-orange-500 px-4 py-3 sm:py-4 rounded-lg font-semibold text-sm sm:text-base active:scale-[0.98]"
         >
-          <FiPlus /> Adicionar Pergunta
+          <FiPlus /> Pergunta
         </button>
 
         {questions.map((q, qIndex) => (
           <div
             key={qIndex}
-            className="bg-black/40 border border-orange-500/10 p-5 rounded-xl space-y-3 hover:border-orange-500/30 transition"
+            className="bg-black/40 border border-orange-500/10 p-4 sm:p-5 rounded-xl space-y-3"
           >
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-400">
+              <span className="text-xs sm:text-sm text-gray-400">
                 Pergunta {qIndex + 1}
               </span>
 
               <button
                 onClick={() => removeQuestion(qIndex)}
-                className="flex items-center gap-1 text-red-400 hover:text-red-300 text-sm"
+                className="flex items-center gap-1 text-red-400 text-xs sm:text-sm active:scale-95"
               >
                 <FiTrash2 /> Remover
               </button>
@@ -210,7 +207,7 @@ export default function EditLessonPage() {
                 setQuestions(updated);
               }}
               placeholder="Pergunta"
-              className="w-full p-3 bg-black/50 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
+              className="w-full p-3 sm:p-4 bg-black/50 border border-orange-500/20 rounded-lg text-sm"
             />
 
             {q.options.map((opt: any, oIndex: number) => (
@@ -223,7 +220,7 @@ export default function EditLessonPage() {
                     setQuestions(updated);
                   }}
                   placeholder="Opção"
-                  className="flex-1 p-2 bg-black/50 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
+                  className="flex-1 p-2 sm:p-3 bg-black/50 border border-orange-500/20 rounded-lg text-sm"
                 />
 
                 <button
@@ -237,10 +234,10 @@ export default function EditLessonPage() {
                     );
                     setQuestions(updated);
                   }}
-                  className={`p-2 rounded-md transition ${
+                  className={`p-2 sm:p-3 rounded-md ${
                     opt.isCorrect
-                      ? "bg-green-500 text-white shadow"
-                      : "bg-white/10 text-gray-400 hover:bg-white/20"
+                      ? "bg-green-500 text-white"
+                      : "bg-white/10 text-gray-400"
                   }`}
                 >
                   <FiCheckCircle />
@@ -248,7 +245,7 @@ export default function EditLessonPage() {
 
                 <button
                   onClick={() => removeOption(qIndex, oIndex)}
-                  className="text-red-400 hover:text-red-300"
+                  className="text-red-400 p-2 active:scale-90"
                 >
                   <FiTrash2 />
                 </button>
@@ -257,9 +254,9 @@ export default function EditLessonPage() {
 
             <button
               onClick={() => addOption(qIndex)}
-              className="text-orange-400 text-sm hover:text-orange-300 transition"
+              className="text-orange-400 text-xs sm:text-sm"
             >
-              + adicionar opção
+              + opção
             </button>
           </div>
         ))}
@@ -267,10 +264,10 @@ export default function EditLessonPage() {
         <button
           onClick={handleUpdate}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-orange-500 to-orange-600 py-3 rounded-lg font-bold hover:opacity-90 transition shadow-lg"
+          className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-orange-500 to-orange-600 py-3 sm:py-4 rounded-lg font-bold text-sm sm:text-base active:scale-[0.98]"
         >
           <FiSave />
-          {loading ? "Salvando..." : "Salvar alterações"}
+          {loading ? "Salvando..." : "Salvar"}
         </button>
       </div>
     </div>

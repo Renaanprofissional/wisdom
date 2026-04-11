@@ -54,12 +54,10 @@ export default function CreateLessonPage() {
       setIsAdmin(true);
 
       const lessonsRes = await fetch("/api/admin/list-lessons");
-      const lessonsData = await lessonsRes.json();
-      setLessons(lessonsData);
+      setLessons(await lessonsRes.json());
 
       const coursesRes = await fetch("/api/admin/list-courses");
-      const coursesData = await coursesRes.json();
-      setCourses(coursesData);
+      setCourses(await coursesRes.json());
     };
 
     init();
@@ -88,10 +86,7 @@ export default function CreateLessonPage() {
 
   const handleSubmit = async () => {
     try {
-      if (!selectedCourseId) {
-        toast.error("Selecione um curso");
-        return;
-      }
+      if (!selectedCourseId) return toast.error("Selecione um curso");
 
       setLoading(true);
 
@@ -107,7 +102,6 @@ export default function CreateLessonPage() {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error);
 
       toast.success("Lição criada 🚀");
@@ -118,8 +112,7 @@ export default function CreateLessonPage() {
       setSelectedCourseId("");
 
       const lessonsRes = await fetch("/api/admin/list-lessons");
-      const lessonsData = await lessonsRes.json();
-      setLessons(lessonsData);
+      setLessons(await lessonsRes.json());
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -129,7 +122,7 @@ export default function CreateLessonPage() {
 
   if (isPending || isAdmin === null) {
     return (
-      <div className="text-orange-400 text-center mt-20 animate-pulse text-lg">
+      <div className="text-orange-400 text-center mt-20 animate-pulse px-4">
         Carregando...
       </div>
     );
@@ -138,32 +131,30 @@ export default function CreateLessonPage() {
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white p-6 space-y-12">
-      <div>
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition font-medium"
-        >
-          <FiArrowLeft /> Voltar
-        </Link>
-      </div>
+    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white px-4 sm:px-6 py-6 space-y-10">
+      <Link
+        href="/admin"
+        className="inline-flex items-center gap-2 text-orange-400 text-sm sm:text-base"
+      >
+        <FiArrowLeft /> Voltar
+      </Link>
 
-      <div className="max-w-2xl mx-auto space-y-6 bg-[#111] border border-orange-500/10 p-8 rounded-2xl shadow-[0_0_40px_rgba(255,115,0,0.08)]">
-        <h1 className="text-3xl font-bold text-center bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
-          <FiBookOpen /> Criar Nova Lição
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#111] border border-orange-500/10 p-5 sm:p-8 rounded-2xl">
+        <h1 className="text-xl sm:text-3xl font-bold text-center bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
+          <FiBookOpen /> Criar Lição
         </h1>
 
         <input
           placeholder="Título da lição"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/30 transition"
+          className="w-full p-3 bg-black/40 border border-orange-500/20 rounded-lg text-sm sm:text-base focus:outline-none"
         />
 
         <select
           value={selectedCourseId}
           onChange={(e) => setSelectedCourseId(e.target.value)}
-          className="w-full p-3 bg-black/40 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
+          className="w-full p-3 bg-black/40 border border-orange-500/20 rounded-lg text-sm sm:text-base"
         >
           <option value="">Selecione um curso</option>
           {courses.map((course) => (
@@ -173,15 +164,14 @@ export default function CreateLessonPage() {
           ))}
         </select>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="flex items-center gap-2 bg-black/40 border border-orange-500/20 rounded-lg px-3">
             <FiAward className="text-orange-400" />
             <input
               type="number"
-              placeholder="XP"
               value={xp}
               onChange={(e) => setXp(Number(e.target.value))}
-              className="w-full bg-transparent p-3 focus:outline-none"
+              className="w-full bg-transparent p-3 text-sm sm:text-base focus:outline-none"
             />
           </div>
 
@@ -189,25 +179,24 @@ export default function CreateLessonPage() {
             <FiLayers className="text-orange-400" />
             <input
               type="number"
-              placeholder="Nível"
               value={level}
               onChange={(e) => setLevel(Number(e.target.value))}
-              className="w-full bg-transparent p-3 focus:outline-none"
+              className="w-full bg-transparent p-3 text-sm sm:text-base focus:outline-none"
             />
           </div>
         </div>
 
         <button
           onClick={addQuestion}
-          className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 active:scale-[0.98] transition px-4 py-3 rounded-lg font-semibold shadow-md"
+          className="w-full flex items-center justify-center gap-2 bg-orange-500 px-4 py-3 rounded-lg font-semibold"
         >
-          <FiPlus /> Adicionar Pergunta
+          <FiPlus /> Pergunta
         </button>
 
         {questions.map((q, qIndex) => (
           <div
             key={qIndex}
-            className="bg-black/40 border border-orange-500/10 p-5 rounded-xl space-y-3 hover:border-orange-500/30 transition"
+            className="bg-black/40 border border-orange-500/10 p-4 sm:p-5 rounded-xl space-y-3"
           >
             <input
               placeholder={`Pergunta ${qIndex + 1}`}
@@ -217,7 +206,7 @@ export default function CreateLessonPage() {
                 updated[qIndex].question = e.target.value;
                 setQuestions(updated);
               }}
-              className="w-full p-3 bg-black/50 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
+              className="w-full p-3 bg-black/50 border border-orange-500/20 rounded-lg text-sm sm:text-base"
             />
 
             {q.options.map((opt: any, oIndex: number) => (
@@ -229,7 +218,7 @@ export default function CreateLessonPage() {
                     updated[qIndex].options[oIndex].text = e.target.value;
                     setQuestions(updated);
                   }}
-                  className="flex-1 p-2 bg-black/50 border border-orange-500/20 rounded-lg focus:outline-none focus:border-orange-500"
+                  className="flex-1 p-2 bg-black/50 border border-orange-500/20 rounded-lg text-sm"
                 />
 
                 <button
@@ -243,10 +232,10 @@ export default function CreateLessonPage() {
                     );
                     setQuestions(updated);
                   }}
-                  className={`p-2 rounded-md transition ${
+                  className={`p-2 rounded-md ${
                     opt.isCorrect
-                      ? "bg-green-500 text-white shadow"
-                      : "bg-white/10 text-gray-400 hover:bg-white/20"
+                      ? "bg-green-500 text-white"
+                      : "bg-white/10 text-gray-400"
                   }`}
                 >
                   <FiCheckCircle />
@@ -256,39 +245,39 @@ export default function CreateLessonPage() {
 
             <button
               onClick={() => addOption(qIndex)}
-              className="text-orange-400 text-sm hover:text-orange-300 transition"
+              className="text-orange-400 text-xs sm:text-sm"
             >
-              + adicionar opção
+              + opção
             </button>
           </div>
         ))}
 
         <button
           onClick={handleSubmit}
-          className="w-full bg-linear-to-r from-orange-500 to-orange-600 py-3 rounded-lg font-bold hover:opacity-90 active:scale-[0.99] transition shadow-lg"
+          className="w-full bg-linear-to-r from-orange-500 to-orange-600 py-3 rounded-lg font-bold"
         >
           {loading ? "Criando..." : "Criar Lição"}
         </button>
       </div>
 
       <div className="max-w-2xl mx-auto space-y-4">
-        <h2 className="text-2xl font-bold text-orange-400 flex items-center gap-2">
+        <h2 className="text-lg sm:text-2xl font-bold text-orange-400 flex items-center gap-2">
           <FiBookOpen /> Lições
         </h2>
 
         {lessons.map((lesson) => (
           <div
             key={lesson.id}
-            className="bg-[#111] border border-orange-500/10 p-5 rounded-xl flex justify-between items-center hover:border-orange-500/40 hover:shadow-[0_0_20px_rgba(255,115,0,0.15)] transition"
+            className="bg-[#111] border border-orange-500/10 p-4 rounded-xl flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3"
           >
             <div>
-              <p className="font-bold text-lg">{lesson.title}</p>
+              <p className="font-bold text-sm sm:text-lg">{lesson.title}</p>
 
-              <p className="text-sm text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-400">
                 Nível {lesson.level} • {lesson.questions.length} perguntas
               </p>
 
-              <p className="text-xs text-orange-400">
+              <p className="text-[10px] sm:text-xs text-orange-400">
                 {lesson.course?.sourceLanguage?.name} →{" "}
                 {lesson.course?.targetLanguage?.name}
               </p>
@@ -296,7 +285,7 @@ export default function CreateLessonPage() {
 
             <button
               onClick={() => router.push(`/admin/edit-lesson/${lesson.id}`)}
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg transition shadow"
+              className="flex items-center justify-center gap-2 bg-orange-500 px-4 py-2 rounded-lg text-sm"
             >
               <FiEdit /> Editar
             </button>
