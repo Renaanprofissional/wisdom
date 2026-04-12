@@ -1,7 +1,9 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { userAgent } from "next/server";
 import { useEffect, useRef, useState } from "react";
+import { FaCheckCircle, FaHome, FaRedo } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 type Option = {
@@ -270,31 +272,52 @@ export default function LessonPage() {
 
   if (finished) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] text-white gap-6 px-6">
-        <h1 className="text-3xl font-bold bg-linear-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
-          🎉 Lição concluída!
-        </h1>
+      <div className="min-h-screen flex items-center justify-center bg-[#050505] text-white px-6">
+        <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 flex flex-col items-center gap-6 shadow-2xl">
+          {/* Ícone */}
+          <div className="relative">
+            <FaCheckCircle className="text-6xl text-orange-400 animate-pulse" />
+            <div className="absolute inset-0 blur-2xl bg-orange-400/30 rounded-full"></div>
+          </div>
 
-        <p className="text-white/50 text-center">
-          {lesson.alreadyCompleted
-            ? "Revisão concluída!"
-            : "Você ganhou XP e avançou!"}
-        </p>
+          {/* Título */}
+          <h1 className="text-3xl font-bold text-center bg-linear-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
+            Lição concluída!
+          </h1>
 
-        <div className="flex gap-4">
-          <button
-            onClick={resetLesson}
-            className="px-6 py-3 bg-[#111] border border-orange-500/20 hover:bg-[#1a1a1a] rounded-xl transition"
-          >
-            🔁 Refazer
-          </button>
+          {/* Subtexto */}
+          <p className="text-white/60 text-center text-sm leading-relaxed">
+            {lesson.alreadyCompleted
+              ? "Você revisou essa lição com sucesso. Consistência é o segredo 🚀"
+              : "Parabéns! Você ganhou XP e está evoluindo cada vez mais 🔥"}
+          </p>
 
-          <button
-            onClick={() => router.push("/")}
-            className="px-6 py-3 bg-linear-to-r from-orange-400 to-amber-500 text-black font-semibold rounded-xl shadow-lg"
-          >
-            Dashboard
-          </button>
+          {/* XP / Feedback */}
+          {!lesson.alreadyCompleted && (
+            <div className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+              <p className="text-sm text-white/50">XP ganho</p>
+              <p className="text-2xl font-bold text-orange-400">+50 XP</p>
+            </div>
+          )}
+
+          {/* Botões */}
+          <div className="flex w-full gap-3 mt-2">
+            <button
+              onClick={resetLesson}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl transition-all duration-200 active:scale-95"
+            >
+              <FaRedo />
+              Refazer
+            </button>
+
+            <button
+              onClick={() => router.push("/")}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-orange-400 to-amber-500 text-black font-semibold rounded-xl shadow-lg hover:brightness-110 transition-all duration-200 active:scale-95"
+            >
+              <FaHome />
+              Dashboard
+            </button>
+          </div>
         </div>
       </div>
     );
