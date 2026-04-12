@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 type Option = {
@@ -40,6 +40,31 @@ export default function LessonPage() {
 
   const [lives, setLives] = useState<number | null>(null);
   const [isUnlimited, setIsUnlimited] = useState(false);
+
+  //🔊 SONS
+  const correctSound = useRef<HTMLAudioElement | null>(null);
+  const wrongSound = useRef<HTMLAudioElement | null>(null);
+  const winSound = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    correctSound.current = new Audio("/sounds/correct.mp3");
+    wrongSound.current = new Audio("/sounds/wrong.mp3");
+    winSound.current = new Audio("/sounds/win.mp3");
+  }, []);
+
+  const playSound = (type: "correct" | "wrong" | "win") => {
+    const map = {
+      correct: correctSound.current,
+      wrong: wrongSound.current,
+      win: winSound.current,
+    };
+
+    const sound = map[type];
+    if (sound) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+  };
 
   const resetLesson = () => {
     setCurrent(0);
@@ -132,9 +157,11 @@ export default function LessonPage() {
 
       if (data.correct) {
         setStatus("correct");
+        playSound("correct");
         toast.success("Correto! Clique em continuar!");
       } else {
         setStatus("wrong");
+        playSound("wrong");
         toast.error("Resposta errada, Tente novamente");
 
         if (!lesson.alreadyCompleted) {
@@ -184,6 +211,7 @@ export default function LessonPage() {
     if (isLast) {
       if (lesson.alreadyCompleted) {
         setFinished(true);
+        playSound("win");
         return;
       }
 
@@ -215,6 +243,7 @@ export default function LessonPage() {
       if (!res.ok) {
         if (data.error === "Lição já concluída") {
           setFinished(true);
+          playSound("win");
           return;
         }
 
@@ -222,6 +251,7 @@ export default function LessonPage() {
       }
 
       toast.success(`+${data.xpGained} XP 🚀`);
+      playSound("win");
       setFinished(true);
     } catch (err: any) {
       toast.error(err.message);
