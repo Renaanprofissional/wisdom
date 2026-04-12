@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  FaWhatsapp,
-  FaCrown,
-  FaFire,
-  FaInfinity,
-  FaBolt,
-} from "react-icons/fa";
+import { FaWhatsapp, FaCrown, FaInfinity, FaBolt } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { NavMenu } from "@/components/common/navMenu";
 
@@ -45,9 +39,8 @@ export default function ContatoPage() {
         {/* Benefícios */}
         <div className="space-y-3 text-sm">
           <Benefit icon={<FaInfinity />} text="Vidas ilimitadas" />
-          <Benefit icon={<FaFire />} text="Streak infinito" />
           <Benefit icon={<FaBolt />} text="XP acelerado" />
-          <Benefit icon={<FaCrown />} text="Todos os cursos liberados" />
+          <Benefit icon={<FaCrown />} text="Designer exclusivo" />
         </div>
 
         {/* Urgência */}
