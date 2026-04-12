@@ -41,20 +41,6 @@ export default function Authentication() {
     }
   };
 
-  const handleApple = async () => {
-    try {
-      setLoading(true);
-      await authClient.signIn.social({
-        provider: "apple",
-        callbackURL: "/",
-      });
-    } catch {
-      toast.error("Erro ao entrar com Apple");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const onSubmit = async (data: AuthSchema) => {
     setLoading(true);
 
@@ -156,7 +142,6 @@ export default function Authentication() {
             {/* SOCIAL */}
             <div className="flex gap-3 relative z-10">
               <AuthGoogleButton loading={loading} onClick={handleGoogle} />
-              <AuthAppleButton loading={loading} onClick={handleApple} />
             </div>
 
             {/* DIVIDER */}
