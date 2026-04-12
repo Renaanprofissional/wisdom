@@ -1,7 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -57,7 +57,7 @@ export default function DashboardPage() {
         plan: data.plan ?? { name: "FREE", isUnlimited: false },
       });
     } catch {
-      toast.error("Erro ao carregar dados");
+      toast.error("Não foi possível carregar seus dados");
     }
   }, []);
 
@@ -68,7 +68,7 @@ export default function DashboardPage() {
       const data = await res.json();
       setLessons(data);
     } catch {
-      toast.error("Erro ao carregar lições");
+      toast.error("Falha ao carregar as lições");
     } finally {
       setLoading(false);
     }
@@ -90,14 +90,15 @@ export default function DashboardPage() {
   }, [fetchStats]);
 
   const handleLessonClick = (lesson: Lesson) => {
-    if (isBlocked) return toast.error("Você está sem vidas 😢");
-    if (lesson.locked) return toast.warning("Lição bloqueada 🔒");
+    if (isBlocked) return toast.error("Você ficou sem vidas 💔");
+    if (lesson.locked)
+      return toast.warning("Essa lição ainda está bloqueada 🔒");
     router.push(`/lesson/${lesson.id}`);
   };
 
   const handleLogout = async () => {
     await authClient.signOut();
-    toast.success("Sessão encerrada");
+    toast("Até logo! Volte sempre");
   };
 
   const handleChangeCourse = async () => {
@@ -106,7 +107,7 @@ export default function DashboardPage() {
       body: JSON.stringify({ courseId: null }),
     });
 
-    toast.info("Selecione um novo curso");
+    toast.info("Escolha um novo curso para continuar");
     fetchStats();
   };
 

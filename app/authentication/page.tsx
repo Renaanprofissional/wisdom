@@ -65,7 +65,7 @@ export default function Authentication() {
           password: data.password,
           fetchOptions: {
             onSuccess: () => {
-              toast.success("Login realizado!");
+              toast("Logado com sucesso!");
               router.push("/");
             },
             onError: (ctx: AuthErrorCtx) => {

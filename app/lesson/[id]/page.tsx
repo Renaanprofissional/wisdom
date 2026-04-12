@@ -66,7 +66,7 @@ export default function LessonPage() {
         }
 
         if (data.alreadyCompleted) {
-          toast.info("Você já completou essa lição ✅");
+          toast("Você já completou essa lição");
         }
 
         setLesson(data);
@@ -132,10 +132,10 @@ export default function LessonPage() {
 
       if (data.correct) {
         setStatus("correct");
-        toast.success("Correto! ✅");
+        toast.success("Correto! Clique em continuar!");
       } else {
         setStatus("wrong");
-        toast.error("Resposta errada 😢");
+        toast.error("Resposta errada, Tente novamente");
 
         if (!lesson.alreadyCompleted) {
           await fetch("/api/user/remove-life", {

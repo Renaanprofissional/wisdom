@@ -3,7 +3,8 @@ import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { LanguageProvider } from "@/providers/LanguageProvider";
-import { LanguageToggleButton } from "@/components/common/languageButton";
+import { ToastProvider } from "@/components/providers/ToastProvider";
+// import { LanguageToggleButton } from "@/components/common/languageButton";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -27,9 +28,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
@@ -44,12 +45,17 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col relative">
         <LanguageProvider>
-          {/* BOTÃO AQUI 
+          {/* BOTÃO OPCIONAL */}
+          {/*
           <div className="absolute top-4 right-4 z-50">
             <LanguageToggleButton />
           </div>
           */}
+
           {children}
+
+          {/* ✅ Toast agora funciona */}
+          <ToastProvider />
         </LanguageProvider>
       </body>
     </html>
