@@ -292,14 +292,6 @@ export default function LessonPage() {
               : "Parabéns! Você ganhou XP e está evoluindo cada vez mais 🔥"}
           </p>
 
-          {/* XP / Feedback */}
-          {!lesson.alreadyCompleted && (
-            <div className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-              <p className="text-sm text-white/50">XP ganho</p>
-              <p className="text-2xl font-bold text-orange-400">+50 XP</p>
-            </div>
-          )}
-
           {/* Botões */}
           <div className="flex w-full gap-3 mt-2">
             <button
