@@ -1,7 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,22 @@ import { BsStars } from "react-icons/bs";
 import { FiZap } from "react-icons/fi";
 
 import { NavMenu } from "@/components/common/navMenu";
+
+// 🔊 Simple sound helper
+const playSound = (src: string, volume = 0.5) => {
+  const audio = new Audio(src);
+  audio.volume = volume;
+  audio.play();
+};
+
+// 🎧 Sound map
+const sounds = {
+  click: "/sounds/click.mp3",
+  success: "/sounds/success.mp3",
+  error: "/sounds/error.mp3",
+  levelUp: "/sounds/level-up.mp3",
+  loseLife: "/sounds/wrong.mp3",
+};
 
 type Stats = {
   xp: number;
@@ -57,6 +73,7 @@ export default function DashboardPage() {
         plan: data.plan ?? { name: "FREE", isUnlimited: false },
       });
     } catch {
+      playSound(sounds.error);
       toast.error("Não foi possível carregar seus dados");
     }
   }, []);
@@ -68,6 +85,7 @@ export default function DashboardPage() {
       const data = await res.json();
       setLessons(data);
     } catch {
+      playSound(sounds.error);
       toast.error("Falha ao carregar as lições");
     } finally {
       setLoading(false);
@@ -90,18 +108,31 @@ export default function DashboardPage() {
   }, [fetchStats]);
 
   const handleLessonClick = (lesson: Lesson) => {
-    if (isBlocked) return toast.error("Você ficou sem vidas 💔");
-    if (lesson.locked)
+    playSound(sounds.click);
+
+    if (isBlocked) {
+      playSound(sounds.loseLife);
+      return toast.error("Você ficou sem vidas 💔");
+    }
+
+    if (lesson.locked) {
+      playSound(sounds.error);
       return toast.warning("Essa lição ainda está bloqueada 🔒");
+    }
+
+    playSound(sounds.click);
     router.push(`/lesson/${lesson.id}`);
   };
 
   const handleLogout = async () => {
+    playSound(sounds.click);
     await authClient.signOut();
     toast("Até logo! Volte sempre");
   };
 
   const handleChangeCourse = async () => {
+    playSound(sounds.click);
+
     await fetch("/api/course/select", {
       method: "POST",
       body: JSON.stringify({ courseId: null }),
@@ -246,6 +277,8 @@ function CourseSelector({ onSelect }: { onSelect: () => void }) {
   }, []);
 
   const handleSelect = async (courseId: string) => {
+    playSound(sounds.success);
+
     await fetch("/api/course/select", {
       method: "POST",
       body: JSON.stringify({ courseId }),
