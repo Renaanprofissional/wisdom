@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 export function ToastProvider() {
   return (
     <ToastContainer
-      position="bottom-center"
+      position="top-right"
       autoClose={2000}
       theme="dark"
       style={{ zIndex: 9999 }}
