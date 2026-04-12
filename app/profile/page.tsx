@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { FaFire, FaHeart } from "react-icons/fa";
-import { GiBatwingEmblem } from "react-icons/gi";
+import { FaFire, FaHeart, FaCrown } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
-import { FiUser, FiArrowLeft, FiSettings } from "react-icons/fi";
+import { FiUser, FiSettings } from "react-icons/fi";
 import { NavMenu } from "@/components/common/navMenu";
+import { GiBatwingEmblem } from "react-icons/gi";
 
 type UserSession = {
   id: string;
@@ -40,6 +40,9 @@ export default function ProfilePage() {
 
   const user = session?.user as UserSession | undefined;
 
+  const isPro = data?.plan?.isUnlimited;
+  const isAdmin = user?.role === "ADMIN";
+
   useEffect(() => {
     if (isPending) return;
 
@@ -66,7 +69,7 @@ export default function ProfilePage() {
 
   if (isPending || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050505] text-orange-400 animate-pulse px-4 text-center">
+      <div className="min-h-screen flex items-center justify-center bg-black text-orange-400 animate-pulse">
         Carregando perfil...
       </div>
     );
@@ -77,87 +80,182 @@ export default function ProfilePage() {
   const STEP = 1000;
   const progress = ((data.xp % STEP) / STEP) * 100;
 
+  const theme = isAdmin ? "admin" : isPro ? "pro" : "free";
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white px-4 sm:px-6 py-6">
-      <div className="max-w-3xl mx-auto space-y-6 mb-15">
-        <div className="bg-[#111] p-4 sm:p-6 rounded-2xl border border-orange-500/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-lg sm:text-xl">
-              <FiUser />
+    <div
+      className={`min-h-screen px-4 py-6 text-white
+      ${
+        theme === "admin"
+          ? "bg-black"
+          : theme === "pro"
+            ? "bg-linear-to-br from-black via-[#0a0a0a] to-[#1a1a1a]"
+            : "bg-[#050505]"
+      }`}
+    >
+      <div className="max-w-4xl mx-auto space-y-6 mb-16">
+        {/* HEADER */}
+        <div
+          className={`relative p-6 rounded-2xl flex flex-col sm:flex-row justify-between gap-4 overflow-hidden
+          ${
+            theme === "admin"
+              ? "bg-linear-to-r from-orange-500/15 via-yellow-400/10 to-orange-600/15 border border-orange-400/40 shadow-[0_0_50px_rgba(255,140,0,0.4)]"
+              : theme === "pro"
+                ? "bg-linear-to-r from-yellow-400/10 to-orange-500/10 border border-yellow-400/30 shadow-[0_0_30px_rgba(255,200,0,0.25)]"
+                : "bg-[#111] border border-orange-500/10"
+          }`}
+        >
+          {(theme === "pro" || theme === "admin") && (
+            <div className="absolute inset-0 blur-3xl opacity-20 bg-orange-400" />
+          )}
+
+          <div className="flex items-center gap-4 relative z-10">
+            <div
+              className={`w-16 h-16 rounded-full flex items-center justify-center text-xl
+              ${
+                theme === "admin"
+                  ? "bg-orange-500/30 text-yellow-300 shadow-[0_0_20px_rgba(255,140,0,0.6)]"
+                  : theme === "pro"
+                    ? "bg-yellow-400/20 text-yellow-300"
+                    : "bg-orange-500/20 text-orange-400"
+              }`}
+            >
+              {theme === "admin" ? <FaCrown /> : <FiUser />}
             </div>
 
             <div>
-              <h1 className="text-lg sm:text-2xl font-bold">{user.name}</h1>
-              <p className="text-xs sm:text-sm text-gray-400 break-all">
-                {user.email}
-              </p>
-              <p className="text-[10px] sm:text-xs text-orange-400 mt-1">
-                Plano: {data.plan?.name}
-              </p>
-            </div>
-          </div>
+              <h1 className="text-2xl font-bold">{user.name}</h1>
+              <p className="text-sm text-gray-400">{user.email}</p>
 
-          <div className="flex flex-col sm:items-end gap-2">
-            <span
-              className={`px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold ${
-                user.role === "ADMIN"
-                  ? "bg-orange-500/20 text-orange-400 border border-orange-500/30"
-                  : "bg-gray-500/20 text-gray-400"
-              }`}
-            >
-              {user.role === "ADMIN" ? "ADMIN" : "USER"}
-            </span>
-
-            <div className="flex gap-2 flex-wrap">
-              {user.role === "ADMIN" && (
-                <button
-                  onClick={() => router.push("/admin")}
-                  className="flex items-center gap-1 text-[10px] sm:text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 px-3 py-1 rounded-lg border border-orange-500/20"
+              <div className="flex items-center gap-2 mt-1">
+                <span
+                  className={`text-xs px-2 py-1 rounded-full font-bold
+                  ${
+                    theme === "admin"
+                      ? "bg-linear-to-r from-yellow-300 to-orange-400 text-black"
+                      : theme === "pro"
+                        ? "bg-yellow-300 text-black"
+                        : "bg-orange-500/20 text-orange-400"
+                  }`}
                 >
-                  <FiSettings />
-                </button>
-              )}
+                  {theme === "admin"
+                    ? "ADMIN"
+                    : theme === "pro"
+                      ? "PRO"
+                      : "FREE"}
+                </span>
+
+                <span className="text-xs text-gray-400">
+                  Plano: {data.plan.name}
+                </span>
+              </div>
             </div>
           </div>
+
+          {isAdmin && (
+            <button
+              onClick={() => router.push("/admin")}
+              className="relative z-10 p-2 rounded-lg bg-orange-500/20 text-orange-300 hover:bg-orange-500/30"
+            >
+              <FiSettings />
+            </button>
+          )}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <Stat icon={<BsStars />} value={data.xp} label="XP" />
-          <Stat icon={<GiBatwingEmblem />} value={data.level} label="Level" />
-          <Stat icon={<FaFire />} value={data.streak} label="Streak" />
-          <Stat icon={<FaHeart />} value={data.lives} label="Vidas" />
+        {/* STATS */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <Stat icon={<BsStars />} value={data.xp} label="XP" theme={theme} />
+          <Stat
+            icon={<GiBatwingEmblem />}
+            value={data.level}
+            label="Level"
+            theme={theme}
+          />
+          <Stat
+            icon={<FaFire />}
+            value={data.streak}
+            label="Streak"
+            theme={theme}
+          />
+          <Stat
+            icon={<FaHeart />}
+            value={data.lives}
+            label="Vidas"
+            theme={theme}
+          />
         </div>
 
-        <div className="bg-[#111] p-4 sm:p-6 rounded-2xl border border-orange-500/10">
-          <h2 className="font-bold mb-3 text-orange-400 text-sm sm:text-base">
-            Progresso
-          </h2>
+        {/* PROGRESS */}
+        <div
+          className={`p-6 rounded-2xl
+          ${
+            theme === "admin"
+              ? "bg-black border border-orange-400/40 shadow-[0_0_40px_rgba(255,140,0,0.25)]"
+              : theme === "pro"
+                ? "bg-yellow-400/10 border border-yellow-400/30"
+                : "bg-[#111] border border-orange-500/10"
+          }`}
+        >
+          <h2 className="font-bold mb-3">Progresso</h2>
 
-          <div className="w-full bg-black/40 rounded-full h-3 sm:h-4 overflow-hidden">
+          <div className="w-full h-4 bg-black rounded-full overflow-hidden">
             <div
-              className="h-full bg-linear-to-r from-orange-400 via-orange-500 to-amber-500 transition-all duration-500"
+              className={`h-full transition-all duration-500
+              ${
+                theme === "admin"
+                  ? "bg-linear-to-r from-yellow-300 via-orange-400 to-orange-500"
+                  : theme === "pro"
+                    ? "bg-linear-to-r from-yellow-300 to-orange-500"
+                    : "bg-linear-to-r from-orange-400 to-yellow-400"
+              }`}
               style={{ width: `${progress}%` }}
             />
           </div>
 
-          <p className="text-xs sm:text-sm text-gray-400 mt-2">
+          <p className="text-sm text-gray-400 mt-2">
             {data.xp % STEP} XP neste nível
           </p>
         </div>
 
+        {/* COURSE */}
         {data.activeCourse && (
-          <div className="bg-[#111] p-4 sm:p-6 rounded-2xl border border-orange-500/10">
-            <h2 className="font-bold mb-2 text-orange-400 text-sm sm:text-base">
-              Curso Atual
-            </h2>
+          <div
+            className={`relative p-6 rounded-2xl overflow-hidden
+            ${
+              theme === "admin"
+                ? "bg-linear-to-r from-orange-500/10 to-yellow-400/10 border border-orange-400/40 shadow-[0_0_30px_rgba(255,140,0,0.25)]"
+                : theme === "pro"
+                  ? "bg-linear-to-r from-yellow-400/10 to-orange-500/10 border border-yellow-400/30"
+                  : "bg-[#111] border border-orange-500/10"
+            }`}
+          >
+            {(theme === "pro" || theme === "admin") && (
+              <div className="absolute inset-0 blur-3xl opacity-20 bg-orange-400" />
+            )}
 
-            <p className="text-sm sm:text-lg text-gray-300">
-              {data.activeCourse.sourceLanguage.name} →{" "}
-              {data.activeCourse.targetLanguage.name}
-            </p>
+            <div className="relative z-10">
+              <h2
+                className={`font-bold mb-2
+                ${
+                  theme === "admin"
+                    ? "text-orange-300"
+                    : theme === "pro"
+                      ? "text-yellow-300"
+                      : "text-orange-400"
+                }`}
+              >
+                Curso Atual
+              </h2>
+
+              <p className="text-lg text-gray-300">
+                {data.activeCourse.sourceLanguage.name} →{" "}
+                {data.activeCourse.targetLanguage.name}
+              </p>
+            </div>
           </div>
         )}
       </div>
+
       <NavMenu />
     </div>
   );
@@ -167,18 +265,27 @@ function Stat({
   icon,
   value,
   label,
+  theme,
 }: {
   icon: React.ReactNode;
   value: any;
   label: string;
+  theme: string;
 }) {
   return (
-    <div className="bg-[#111] p-3 sm:p-4 rounded-xl border border-orange-500/10 text-center">
-      <div className="text-orange-400 text-base sm:text-xl flex justify-center mb-1">
-        {icon}
-      </div>
-      <p className="text-sm sm:text-lg font-bold">{value}</p>
-      <span className="text-[10px] sm:text-xs text-gray-400">{label}</span>
+    <div
+      className={`p-4 rounded-xl text-center
+      ${
+        theme === "admin"
+          ? "bg-black border border-orange-400/40 text-orange-300"
+          : theme === "pro"
+            ? "bg-yellow-400/10 border border-yellow-400/30 text-yellow-300"
+            : "bg-[#111] border border-orange-500/10 text-orange-400"
+      }`}
+    >
+      <div className="text-xl flex justify-center mb-1">{icon}</div>
+      <p className="text-lg font-bold">{value}</p>
+      <span className="text-xs opacity-70">{label}</span>
     </div>
   );
 }

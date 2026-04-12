@@ -8,29 +8,41 @@ export async function GET() {
       include: {
         progresses: true,
         streak: true,
+        activeSubscription: {
+          include: {
+            plan: true,
+          },
+        },
       },
     });
 
     const ranking = users.map((user) => {
       const progress = user.progresses?.[0];
       const streak = user.streak;
+      const plan = user.activeSubscription?.plan;
 
       return {
         id: user.id,
         name: user.name,
         image: user.image,
+
         xp: progress?.xp ?? 0,
         level: progress?.level ?? 1,
         streak: streak?.currentDays ?? 0,
+
+        isPro: plan?.name === "PRO",
       };
     });
 
-    // 🔥 ordena por streak primeiro (ou troca por xp)
-    ranking.sort((a, b) => b.streak - a.streak);
+    // Ordena por XP e usa streak como desempate
+    ranking.sort((a, b) => {
+      if (b.xp !== a.xp) return b.xp - a.xp;
+      return b.streak - a.streak;
+    });
 
     return NextResponse.json(ranking);
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Erro" }, { status: 500 });
+    console.error("RANKING_ERROR:", err);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }

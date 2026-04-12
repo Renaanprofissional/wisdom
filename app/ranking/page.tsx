@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { FaFire, FaCrown } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
-import { GiBatwingEmblem } from "react-icons/gi";
 import { NavMenu } from "@/components/common/navMenu";
+import { FaRankingStar } from "react-icons/fa6";
 
 type UserRank = {
   id: string;
@@ -14,6 +13,7 @@ type UserRank = {
   xp: number;
   level: number;
   streak: number;
+  isPro?: boolean;
 };
 
 export default function RankingPage() {
@@ -21,20 +21,16 @@ export default function RankingPage() {
   const [filteredUsers, setFilteredUsers] = useState<UserRank[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const router = useRouter();
 
   useEffect(() => {
     const fetchRanking = async () => {
-      try {
-        const res = await fetch("/api/ranking");
-        const data = await res.json();
-        setUsers(data);
-        setFilteredUsers(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+      const res = await fetch("/api/ranking");
+      const data = await res.json();
+
+      const sorted = [...data].sort((a, b) => b.xp - a.xp);
+      setUsers(sorted);
+      setFilteredUsers(sorted);
+      setLoading(false);
     };
 
     fetchRanking();
@@ -44,134 +40,231 @@ export default function RankingPage() {
     const filtered = users.filter((u) =>
       u.name.toLowerCase().includes(search.toLowerCase()),
     );
+
     setFilteredUsers(filtered);
   }, [search, users]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-orange-400 text-lg animate-pulse px-4 text-center">
-        Carregando ranking...
+      <div className="min-h-screen flex items-center justify-center bg-black text-orange-400 animate-pulse">
+        <FaRankingStar /> Carregando ranking...
       </div>
     );
   }
 
-  const top3 = filteredUsers.slice(0, 3);
-  const rest = filteredUsers.slice(3);
+  const top3 = users.slice(0, 3);
+
+  const rest = search
+    ? filteredUsers
+    : filteredUsers.filter((u) => !top3.some((t) => t.id === u.id));
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-black via-[#050505] to-black text-white px-4 sm:px-6 py-6">
-      <div className="max-w-5xl mx-auto mb-15">
+    <div className="min-h-screen bg-black text-white px-4 py-6">
+      <div className="max-w-5xl mx-auto mb-16">
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <h1 className="text-2xl sm:text-4xl font-bold text-orange-400 flex items-center gap-2">
-            🔥 Ranking Global
-          </h1>
-        </div>
+        <h1 className="text-4xl font-bold bg-linear-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent mb-6">
+          <FaRankingStar className="text-amber-600" /> Ranking Wisdom
+        </h1>
 
         {/* SEARCH */}
         <input
-          placeholder="Buscar usuário..."
+          placeholder="Buscar jogador..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full mb-6 sm:mb-8 p-3 rounded-xl bg-[#111] border border-orange-500/20 focus:outline-none focus:border-orange-400 text-sm sm:text-base"
+          className="w-full mb-10 p-3 rounded-xl bg-[#111] border border-white/10 focus:border-orange-400 outline-none"
         />
 
         {/* TOP 3 */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 sm:mb-10">
-          {top3.map((user, index) => {
-            const avatar = user.image || "/wisdom.svg";
+        {!search && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
+            {/* FIRST */}
+            {top3[0] && (
+              <div className="relative p-6 rounded-3xl text-center overflow-hidden bg-linear-to-br from-yellow-400/30 via-orange-500/30 to-black border border-yellow-400 shadow-[0_0_70px_rgba(255,200,0,0.5)]">
+                {top3[0].isPro && (
+                  <div className="absolute inset-0 bg-yellow-300/20 blur-3xl animate-pulse" />
+                )}
 
-            const styles = [
-              "sm:scale-105 bg-yellow-500/20 border-yellow-400",
-              "bg-gray-400/10 border-gray-300",
-              "bg-orange-500/10 border-orange-400",
-            ];
-
-            return (
-              <div
-                key={user.id}
-                className={`p-4 rounded-2xl border text-center ${styles[index]} shadow-lg`}
-              >
-                <div className="flex justify-center mb-2">
-                  <FaCrown
-                    className={`text-xl sm:text-2xl ${
-                      index === 0
-                        ? "text-yellow-400"
-                        : index === 1
-                          ? "text-gray-300"
-                          : "text-orange-400"
-                    }`}
-                  />
-                </div>
+                <FaCrown className="mx-auto text-yellow-300 text-4xl mb-3 relative z-10" />
 
                 <img
-                  src={avatar}
-                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full mx-auto mb-2 border-2 border-white/20"
+                  src={top3[0].image || "/wisdom.svg"}
+                  className={`w-24 h-24 mx-auto rounded-full mb-3 relative z-10 ${
+                    top3[0].isPro
+                      ? "border-4 border-yellow-400 shadow-[0_0_20px_rgba(255,200,0,0.6)]"
+                      : "border-2 border-orange-400"
+                  }`}
                 />
 
-                <p className="font-bold text-sm sm:text-base">{user.name}</p>
+                <p className="font-bold text-xl flex items-center justify-center gap-2 relative z-10">
+                  {top3[0].name}
+                  {top3[0].isPro && (
+                    <span className="text-xs px-2 py-0.5 bg-yellow-300 text-black rounded-full font-bold animate-pulse">
+                      ELITE
+                    </span>
+                  )}
+                </p>
 
-                <p className="text-xs text-gray-400">Level {user.level}</p>
+                <p className="text-xs text-yellow-300 mt-1 relative z-10">
+                  #1 CAMPEÃO
+                </p>
 
-                <div className="mt-2 text-xs text-orange-400 flex justify-center gap-2">
-                  <BsStars /> {user.xp}
+                <div className="flex justify-center gap-4 mt-3 relative z-10">
+                  <span className="text-yellow-300 flex items-center gap-1">
+                    <BsStars /> {top3[0].xp}
+                  </span>
+                  <span className="text-red-400 flex items-center gap-1">
+                    <FaFire /> {top3[0].streak}
+                  </span>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            )}
 
-        {/* LIST */}
+            {/* SECOND */}
+            {top3[1] && (
+              <div className="relative p-5 rounded-3xl text-center bg-linear-to-br from-gray-300/20 to-black border border-gray-400 overflow-hidden">
+                {top3[1].isPro && (
+                  <div className="absolute inset-0 bg-yellow-300/10 blur-2xl animate-pulse" />
+                )}
+
+                <FaCrown className="mx-auto text-gray-300 text-3xl mb-3 relative z-10" />
+
+                <img
+                  src={top3[1].image || "/wisdom.svg"}
+                  className={`w-20 h-20 mx-auto rounded-full mb-3 relative z-10 ${
+                    top3[1].isPro
+                      ? "border-2 border-yellow-400 shadow"
+                      : "border-2 border-gray-400"
+                  }`}
+                />
+
+                <p className="font-semibold text-lg flex items-center justify-center gap-2 relative z-10">
+                  {top3[1].name}
+                  {top3[1].isPro && (
+                    <span className="text-xs px-2 py-0.5 bg-yellow-300 text-black rounded-full font-bold animate-pulse">
+                      PRO
+                    </span>
+                  )}
+                </p>
+
+                <p className="text-xs text-gray-400 relative z-10">#2 Lugar</p>
+
+                <div className="flex justify-center gap-4 mt-3 relative z-10">
+                  <span className="text-orange-400 flex items-center gap-1">
+                    <BsStars /> {top3[1].xp}
+                  </span>
+                  <span className="text-red-400 flex items-center gap-1">
+                    <FaFire /> {top3[1].streak}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* THIRD */}
+            {top3[2] && (
+              <div className="relative p-5 rounded-3xl text-center bg-linear-to-br from-orange-900/30 to-black border border-orange-800 overflow-hidden">
+                {top3[2].isPro && (
+                  <div className="absolute inset-0 bg-yellow-300/10 blur-2xl animate-pulse" />
+                )}
+
+                <FaCrown className="mx-auto text-orange-700 text-3xl mb-3 relative z-10" />
+
+                <img
+                  src={top3[2].image || "/wisdom.svg"}
+                  className={`w-20 h-20 mx-auto rounded-full mb-3 relative z-10 ${
+                    top3[2].isPro
+                      ? "border-2 border-yellow-400 shadow"
+                      : "border-2 border-orange-700"
+                  }`}
+                />
+
+                <p className="font-semibold text-lg text-orange-300 flex items-center justify-center gap-2 relative z-10">
+                  {top3[2].name}
+                  {top3[2].isPro && (
+                    <span className="text-xs px-2 py-0.5 bg-yellow-300 text-black rounded-full font-bold animate-pulse">
+                      PRO
+                    </span>
+                  )}
+                </p>
+
+                <p className="text-xs text-orange-500 relative z-10">
+                  #3 Lugar
+                </p>
+
+                <div className="flex justify-center gap-4 mt-3 relative z-10">
+                  <span className="text-orange-400 flex items-center gap-1">
+                    <BsStars /> {top3[2].xp}
+                  </span>
+                  <span className="text-red-400 flex items-center gap-1">
+                    <FaFire /> {top3[2].streak}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* LISTA */}
         <div className="space-y-3">
-          {rest.map((user, index) => {
-            const avatar = user.image || "/wisdom.svg";
-            const position = index + 4;
+          {rest.map((user) => {
+            const position = users.findIndex((u) => u.id === user.id) + 1;
 
             return (
               <div
                 key={user.id}
-                className="p-3 sm:p-4 rounded-xl border bg-[#111] border-orange-500/10 hover:border-orange-400/40 transition flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                className={`p-4 rounded-xl flex items-center justify-between transition-all ${
+                  user.isPro
+                    ? "bg-linear-to-r from-yellow-500/10 via-orange-500/10 to-yellow-500/10 border border-yellow-400/40 shadow-[0_0_20px_rgba(255,200,0,0.25)] scale-[1.02]"
+                    : "bg-[#111] border border-white/10 hover:border-orange-400/30"
+                }`}
               >
-                {/* TOP (mobile) / LEFT (desktop) */}
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <span className="text-orange-400 font-bold w-8 sm:w-10 text-center text-sm sm:text-base">
-                    #{position}
-                  </span>
+                <div className="flex items-center gap-4 w-full">
+                  <div
+                    className={`w-10 h-10 flex items-center justify-center rounded-full font-bold ${
+                      user.isPro
+                        ? "bg-yellow-400/20 text-yellow-300"
+                        : "bg-orange-500/20 text-orange-400"
+                    }`}
+                  >
+                    {position}
+                  </div>
 
                   <img
-                    src={avatar}
-                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover"
+                    src={user.image || "/wisdom.svg"}
+                    className={`rounded-full ${
+                      user.isPro
+                        ? "w-12 h-12 border-2 border-yellow-400 shadow"
+                        : "w-10 h-10"
+                    }`}
                   />
 
                   <div className="flex-1">
-                    <p className="font-semibold text-sm sm:text-base">
+                    <p className="font-semibold flex items-center gap-2">
                       {user.name}
+
+                      {user.isPro && (
+                        <span className="flex items-center gap-1 text-xs px-2 py-0.5 bg-linear-to-r from-yellow-300 to-orange-400 text-black rounded-full font-bold">
+                          <FaCrown /> PRO
+                        </span>
+                      )}
                     </p>
 
-                    <p className="text-xs text-gray-400">Level {user.level}</p>
-
-                    {/* XP BAR */}
-                    <div className="w-full sm:w-40 h-1 bg-black rounded mt-1 overflow-hidden">
+                    <div className="w-full h-1.5 bg-black mt-1 rounded overflow-hidden">
                       <div
-                        className="h-full bg-orange-400"
-                        style={{ width: `${Math.min(user.xp % 100, 100)}%` }}
+                        className="h-full bg-linear-to-r from-orange-400 to-yellow-400"
+                        style={{
+                          width: `${Math.min(user.xp % 100, 100)}%`,
+                        }}
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* RIGHT */}
-                <div className="flex justify-between sm:justify-end gap-4 sm:gap-5 text-xs sm:text-sm">
-                  <span className="flex items-center gap-1 text-orange-400">
+                <div className="flex gap-4 text-sm">
+                  <span className="text-orange-400 flex items-center gap-1">
                     <BsStars /> {user.xp}
                   </span>
-
-                  <span className="flex items-center gap-1 text-red-400">
+                  <span className="text-red-400 flex items-center gap-1">
                     <FaFire /> {user.streak}
-                  </span>
-
-                  <span className="flex items-center gap-1 text-purple-400">
-                    <GiBatwingEmblem /> {user.level}
                   </span>
                 </div>
               </div>
@@ -179,6 +272,7 @@ export default function RankingPage() {
           })}
         </div>
       </div>
+
       <NavMenu />
     </div>
   );
