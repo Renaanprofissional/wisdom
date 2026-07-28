@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     // 📈 progresso
     const progress = await prisma.userProgress.findFirst({
-      where: { userId },
+      where: { userId, courseId: lesson.courseId },
     });
 
     if (!progress) {

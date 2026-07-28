@@ -22,11 +22,11 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
         className="relative bottom-8"
       />
 
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-muted-foreground">
         {isLogin ? "Não tem conta?" : "Já tem conta?"}{" "}
         <span
           onClick={toggleMode}
-          className="text-orange-400 cursor-pointer font-medium"
+          className="text-brand cursor-pointer font-medium"
         >
           {isLogin ? "Criar conta" : "Entrar"}
         </span>

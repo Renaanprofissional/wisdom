@@ -123,27 +123,27 @@ export default function EditLessonPage() {
 
   if (isPending) {
     return (
-      <div className="text-orange-400 text-center mt-20 animate-pulse px-4">
+      <div className="text-brand text-center mt-20 animate-pulse px-4">
         Carregando...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white px-4 sm:px-6 py-6 space-y-8">
+    <div className="min-h-screen bg-background text-foreground px-4 sm:px-6 py-6 space-y-8">
       <Link
         href="/admin"
-        className="inline-flex items-center gap-2 text-orange-400 text-sm sm:text-base"
+        className="inline-flex items-center gap-2 text-brand text-sm sm:text-base"
       >
         <FiArrowLeft /> Voltar
       </Link>
 
-      <div className="max-w-2xl mx-auto space-y-6 bg-[#111] border border-orange-500/10 p-5 sm:p-8 rounded-2xl">
-        <h1 className="text-xl sm:text-3xl font-bold text-center bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
+      <div className="max-w-2xl mx-auto space-y-6 bg-card border border-border p-5 sm:p-8 rounded-2xl">
+        <h1 className="text-xl sm:text-3xl font-bold text-center text-brand flex items-center justify-center gap-2">
           <FiEdit3 /> Editar Lição
         </h1>
 
-        <div className="bg-black/40 border border-orange-500/10 p-3 sm:p-4 rounded-xl text-xs sm:text-sm text-gray-400 space-y-1">
+        <div className="bg-muted border border-border p-3 sm:p-4 rounded-xl text-xs sm:text-sm text-muted-foreground space-y-1">
           <p>Edite título, XP e perguntas</p>
           <p>Adicione novas perguntas se quiser</p>
           <p>1 resposta correta por pergunta</p>
@@ -153,7 +153,7 @@ export default function EditLessonPage() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Título"
-          className="w-full p-3 sm:p-4 bg-black/40 border border-orange-500/20 rounded-lg text-sm sm:text-base focus:outline-none"
+          className="w-full p-3 sm:p-4 bg-muted border border-border rounded-lg text-sm sm:text-base focus:outline-none"
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -162,7 +162,7 @@ export default function EditLessonPage() {
             value={xp}
             onChange={(e) => setXp(Number(e.target.value))}
             placeholder="XP"
-            className="p-3 sm:p-4 bg-black/40 border border-orange-500/20 rounded-lg text-sm sm:text-base"
+            className="p-3 sm:p-4 bg-muted border border-border rounded-lg text-sm sm:text-base"
           />
 
           <input
@@ -170,13 +170,13 @@ export default function EditLessonPage() {
             value={level}
             onChange={(e) => setLevel(Number(e.target.value))}
             placeholder="Level"
-            className="p-3 sm:p-4 bg-black/40 border border-orange-500/20 rounded-lg text-sm sm:text-base"
+            className="p-3 sm:p-4 bg-muted border border-border rounded-lg text-sm sm:text-base"
           />
         </div>
 
         <button
           onClick={addQuestion}
-          className="w-full flex items-center justify-center gap-2 bg-orange-500 px-4 py-3 sm:py-4 rounded-lg font-semibold text-sm sm:text-base active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2 bg-brand text-brand-foreground px-4 py-3 sm:py-4 rounded-lg font-semibold text-sm sm:text-base active:scale-[0.98] hover:opacity-90"
         >
           <FiPlus /> Pergunta
         </button>
@@ -184,16 +184,16 @@ export default function EditLessonPage() {
         {questions.map((q, qIndex) => (
           <div
             key={qIndex}
-            className="bg-black/40 border border-orange-500/10 p-4 sm:p-5 rounded-xl space-y-3"
+            className="bg-muted border border-border p-4 sm:p-5 rounded-xl space-y-3"
           >
             <div className="flex justify-between items-center">
-              <span className="text-xs sm:text-sm text-gray-400">
+              <span className="text-xs sm:text-sm text-muted-foreground">
                 Pergunta {qIndex + 1}
               </span>
 
               <button
                 onClick={() => removeQuestion(qIndex)}
-                className="flex items-center gap-1 text-red-400 text-xs sm:text-sm active:scale-95"
+                className="flex items-center gap-1 text-destructive text-xs sm:text-sm active:scale-95"
               >
                 <FiTrash2 /> Remover
               </button>
@@ -207,7 +207,7 @@ export default function EditLessonPage() {
                 setQuestions(updated);
               }}
               placeholder="Pergunta"
-              className="w-full p-3 sm:p-4 bg-black/50 border border-orange-500/20 rounded-lg text-sm"
+              className="w-full p-3 sm:p-4 bg-background border border-border rounded-lg text-sm"
             />
 
             {q.options.map((opt: any, oIndex: number) => (
@@ -220,7 +220,7 @@ export default function EditLessonPage() {
                     setQuestions(updated);
                   }}
                   placeholder="Opção"
-                  className="flex-1 p-2 sm:p-3 bg-black/50 border border-orange-500/20 rounded-lg text-sm"
+                  className="flex-1 p-2 sm:p-3 bg-background border border-border rounded-lg text-sm"
                 />
 
                 <button
@@ -236,8 +236,8 @@ export default function EditLessonPage() {
                   }}
                   className={`p-2 sm:p-3 rounded-md ${
                     opt.isCorrect
-                      ? "bg-green-500 text-white"
-                      : "bg-white/10 text-gray-400"
+                      ? "bg-green-600 text-white"
+                      : "bg-muted text-muted-foreground"
                   }`}
                 >
                   <FiCheckCircle />
@@ -245,7 +245,7 @@ export default function EditLessonPage() {
 
                 <button
                   onClick={() => removeOption(qIndex, oIndex)}
-                  className="text-red-400 p-2 active:scale-90"
+                  className="text-destructive p-2 active:scale-90"
                 >
                   <FiTrash2 />
                 </button>
@@ -254,7 +254,7 @@ export default function EditLessonPage() {
 
             <button
               onClick={() => addOption(qIndex)}
-              className="text-orange-400 text-xs sm:text-sm"
+              className="text-brand text-xs sm:text-sm"
             >
               + opção
             </button>
@@ -264,7 +264,7 @@ export default function EditLessonPage() {
         <button
           onClick={handleUpdate}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-orange-500 to-orange-600 py-3 sm:py-4 rounded-lg font-bold text-sm sm:text-base active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2 bg-brand text-brand-foreground py-3 sm:py-4 rounded-lg font-bold text-sm sm:text-base active:scale-[0.98] hover:opacity-90"
         >
           <FiSave />
           {loading ? "Salvando..." : "Salvar"}

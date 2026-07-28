@@ -43,10 +43,6 @@ async function main() {
     create: { name: "PRO", isUnlimited: true },
   });
 
-  await prisma.answerOption.deleteMany();
-  await prisma.question.deleteMany();
-  await prisma.lesson.deleteMany();
-
   async function createLesson({
     title,
     level,
@@ -55,6 +51,20 @@ async function main() {
     type = "VOCABULARY",
     questions,
   }: any) {
+    const existing = await prisma.lesson.findUnique({
+      where: {
+        courseId_title: {
+          courseId: course.id,
+          title,
+        },
+      },
+    });
+
+    if (existing) {
+      console.log(`↩️  Lição "${title}" já existe, pulando...`);
+      return existing;
+    }
+
     return prisma.lesson.create({
       data: {
         courseId: course.id,
@@ -323,6 +333,201 @@ async function main() {
             { text: "Hello", isCorrect: false },
             { text: "See you later", isCorrect: true },
             { text: "Goodbye", isCorrect: false },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Numbers 1",
+      level: 2,
+      xp: 120,
+      difficulty: "ROOKIE",
+      questions: [
+        {
+          question: "Como se diz 'três'?",
+          options: [
+            { text: "Two", isCorrect: false },
+            { text: "Three", isCorrect: true },
+            { text: "Four", isCorrect: false },
+          ],
+        },
+        {
+          question: "Como se diz 'dez'?",
+          options: [
+            { text: "Nine", isCorrect: false },
+            { text: "Eleven", isCorrect: false },
+            { text: "Ten", isCorrect: true },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Colors 1",
+      level: 2,
+      xp: 120,
+      difficulty: "ROOKIE",
+      questions: [
+        {
+          question: "Como se diz 'vermelho'?",
+          options: [
+            { text: "Blue", isCorrect: false },
+            { text: "Red", isCorrect: true },
+            { text: "Green", isCorrect: false },
+          ],
+        },
+        {
+          question: "Como se diz 'azul'?",
+          options: [
+            { text: "Yellow", isCorrect: false },
+            { text: "Blue", isCorrect: true },
+            { text: "Black", isCorrect: false },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Family 1",
+      level: 3,
+      xp: 150,
+      difficulty: "EXPLORER",
+      questions: [
+        {
+          question: "Como se diz 'mãe'?",
+          options: [
+            { text: "Father", isCorrect: false },
+            { text: "Mother", isCorrect: true },
+            { text: "Sister", isCorrect: false },
+          ],
+        },
+        {
+          question: "Como se diz 'irmão'?",
+          options: [
+            { text: "Brother", isCorrect: true },
+            { text: "Uncle", isCorrect: false },
+            { text: "Son", isCorrect: false },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Work 1",
+      level: 4,
+      xp: 210,
+      difficulty: "SPEAKER",
+      questions: [
+        {
+          question: "Como se diz 'trabalho' (substantivo)?",
+          options: [
+            { text: "Job", isCorrect: true },
+            { text: "House", isCorrect: false },
+            { text: "School", isCorrect: false },
+          ],
+        },
+        {
+          question: "Complete: I ___ at a bank",
+          options: [
+            { text: "work", isCorrect: true },
+            { text: "works", isCorrect: false },
+            { text: "working", isCorrect: false },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Grammar 3",
+      level: 4,
+      xp: 230,
+      difficulty: "SPEAKER",
+      type: "GRAMMAR",
+      questions: [
+        {
+          question: "Complete: I ___ finished my homework yet",
+          options: [
+            { text: "haven't", isCorrect: true },
+            { text: "didn't", isCorrect: false },
+            { text: "wasn't", isCorrect: false },
+          ],
+        },
+        {
+          question: "Complete: She ___ to the gym every day",
+          options: [
+            { text: "go", isCorrect: false },
+            { text: "goes", isCorrect: true },
+            { text: "going", isCorrect: false },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Conversation 3",
+      level: 5,
+      xp: 300,
+      difficulty: "THINKER",
+      questions: [
+        {
+          question: "Como se diz 'Quanto custa isso?'",
+          options: [
+            { text: "How much is this?", isCorrect: true },
+            { text: "What is this?", isCorrect: false },
+            { text: "Where is this?", isCorrect: false },
+          ],
+        },
+        {
+          question: "Como se diz 'Eu não entendi'",
+          options: [
+            { text: "I don't know", isCorrect: false },
+            { text: "I don't understand", isCorrect: true },
+            { text: "I don't like", isCorrect: false },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Fluent 1",
+      level: 6,
+      xp: 320,
+      difficulty: "FLUENT",
+      type: "GRAMMAR",
+      questions: [
+        {
+          question: "Complete: If I ___ more time, I would travel more",
+          options: [
+            { text: "have", isCorrect: false },
+            { text: "had", isCorrect: true },
+            { text: "having", isCorrect: false },
+          ],
+        },
+        {
+          question: "Complete: By next year, I ___ here for a decade",
+          options: [
+            { text: "will have worked", isCorrect: true },
+            { text: "will work", isCorrect: false },
+            { text: "work", isCorrect: false },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Master 1",
+      level: 7,
+      xp: 350,
+      difficulty: "MASTER",
+      type: "SPEAKING",
+      questions: [
+        {
+          question: "Qual expressão significa 'desistir'?",
+          options: [
+            { text: "Give up", isCorrect: true },
+            { text: "Give in", isCorrect: false },
+            { text: "Give out", isCorrect: false },
+          ],
+        },
+        {
+          question: "Qual expressão significa 'adiar'?",
+          options: [
+            { text: "Put off", isCorrect: true },
+            { text: "Put on", isCorrect: false },
+            { text: "Put up", isCorrect: false },
           ],
         },
       ],

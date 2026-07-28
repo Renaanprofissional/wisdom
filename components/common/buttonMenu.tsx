@@ -15,17 +15,15 @@ export default function ButtonMenu({ icon, label, active, onClick }: Props) {
       onClick={onClick}
       className={`flex flex-col items-center text-xs transition-all duration-200 ${
         active
-          ? "text-orange-400 scale-110"
-          : "text-white/40 hover:text-white hover:scale-105"
+          ? "text-brand scale-110"
+          : "text-muted-foreground hover:text-foreground hover:scale-105"
       }`}
     >
       <div className="text-lg mb-0.5">{icon}</div>
       <span>{label}</span>
 
       {/* indicador ativo */}
-      {active && (
-        <div className="w-1 h-1 bg-orange-400 rounded-full mt-1 animate-pulse" />
-      )}
+      {active && <div className="w-1 h-1 bg-brand rounded-full mt-1" />}
     </button>
   );
 }

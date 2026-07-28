@@ -17,16 +17,14 @@ export function LanguageToggleButton() {
     <button
       onClick={toggleLanguage}
       className="flex items-center justify-center w-11 h-11 rounded-full
-      bg-[#111]/80 border border-white/10 backdrop-blur-xl
-      shadow-[0_0_20px_rgba(255,115,0,0.08)]
-      hover:scale-110 hover:shadow-[0_0_30px_rgba(255,115,0,0.2)]
-      active:scale-95
+      bg-card border border-border
+      hover:scale-110 active:scale-95
       transition-all duration-300"
     >
       {isPT ? (
-        <GiBrazilFlag className="text-2xl text-gray-400" />
+        <GiBrazilFlag className="text-2xl text-muted-foreground" />
       ) : (
-        <LiaFlagUsaSolid className="text-2xl text-gray-400" />
+        <LiaFlagUsaSolid className="text-2xl text-muted-foreground" />
       )}
     </button>
   );

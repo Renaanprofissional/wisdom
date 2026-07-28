@@ -16,7 +16,7 @@ export const AuthAppleButton: React.FC<AuthAppleButtonProps> = ({
     <Button
       onClick={onClick}
       disabled={loading}
-      className="w-20 h-10 rounded-lg mt-2 bg-mauve-950 text-white cursor-pointer"
+      className="w-full h-10 rounded-lg mt-2 bg-card border border-border text-foreground cursor-pointer"
     >
       <FaApple className="text-lg" />
     </Button>

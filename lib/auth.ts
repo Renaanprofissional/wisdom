@@ -31,5 +31,5 @@ export const auth = betterAuth({
     },
   },
 
-  secret: process.env.AUTH_SECRET!,
+  secret: process.env.BETTER_AUTH_SECRET!,
 });

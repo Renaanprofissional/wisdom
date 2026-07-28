@@ -16,24 +16,24 @@ export default function ContatoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white flex flex-col items-center justify-center p-4 text-center">
-      <div className="max-w-md w-full bg-[#111] border border-orange-500/10 rounded-2xl p-6 space-y-6 shadow-xl mb-15">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 text-center">
+      <div className="max-w-md w-full bg-card border border-border rounded-2xl p-6 space-y-6 mb-15">
         {/* Header */}
         <div className="flex flex-col items-center gap-2">
-          <div className="text-orange-400 text-3xl animate-pulse">
+          <div className="text-brand text-3xl">
             <FaCrown />
           </div>
-          <h1 className="text-2xl font-bold text-orange-400">Plano PRO</h1>
-          <p className="text-sm text-gray-400">
+          <h1 className="text-2xl font-bold text-brand">Plano PRO</h1>
+          <p className="text-sm text-muted-foreground">
             Evolua mais rápido e sem limites 🚀
           </p>
         </div>
 
         {/* Preço */}
-        <div className="bg-[#0f0f0f] border border-orange-500/10 rounded-xl p-4">
-          <p className="text-xs text-gray-400">A partir de</p>
-          <p className="text-3xl font-bold text-orange-400">R$ 19,90</p>
-          <p className="text-xs text-gray-500">/mês</p>
+        <div className="bg-muted rounded-xl p-4">
+          <p className="text-xs text-muted-foreground">A partir de</p>
+          <p className="text-3xl font-bold text-brand">R$ 19,90</p>
+          <p className="text-xs text-muted-foreground">/mês</p>
         </div>
 
         {/* Benefícios */}
@@ -44,27 +44,27 @@ export default function ContatoPage() {
         </div>
 
         {/* Urgência */}
-        <div className="bg-orange-500/10 border border-orange-500/30 text-orange-300 text-xs p-3 rounded-lg">
+        <div className="bg-brand/10 border border-brand/30 text-brand text-xs p-3 rounded-lg">
           🔥 Oferta limitada — fale agora e garanta seu acesso PRO
         </div>
 
         {/* CTA */}
         <button
           onClick={handleWhatsAppRedirect}
-          className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 transition px-4 py-3 rounded-xl font-bold text-white"
+          className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition px-4 py-3 rounded-xl font-bold text-white"
         >
           <FaWhatsapp />
           Assinar via WhatsApp
         </button>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           Atendimento rápido direto com o suporte
         </p>
 
         {/* Voltar */}
         <button
           onClick={() => router.back()}
-          className="text-xs text-orange-400 hover:underline"
+          className="text-xs text-brand hover:underline"
         >
           Voltar
         </button>
@@ -76,9 +76,9 @@ export default function ContatoPage() {
 
 function Benefit({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="flex items-center gap-3 bg-[#0f0f0f] border border-orange-500/10 rounded-lg px-3 py-2">
-      <div className="text-orange-400">{icon}</div>
-      <span className="text-gray-300">{text}</span>
+    <div className="flex items-center gap-3 bg-muted rounded-lg px-3 py-2">
+      <div className="text-brand">{icon}</div>
+      <span className="text-muted-foreground">{text}</span>
     </div>
   );
 }

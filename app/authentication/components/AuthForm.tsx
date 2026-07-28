@@ -40,12 +40,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           <input
             {...register("name")}
             placeholder="Nome completo"
-            className="w-full bg-transparent border-b border-white/10 py-2
-            text-sm text-white placeholder:text-zinc-500 outline-none
-            focus:border-orange-500 transition"
+            className="w-full bg-transparent border-b border-border py-2
+            text-sm text-foreground placeholder:text-muted-foreground outline-none
+            focus:border-brand transition"
           />
           {errors.name && (
-            <p className="text-red-500 text-[11px]">{errors.name.message}</p>
+            <p className="text-destructive text-[11px]">{errors.name.message}</p>
           )}
         </div>
       )}
@@ -55,12 +55,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         <input
           {...register("email")}
           placeholder="Email"
-          className="w-full bg-transparent border-b border-white/10 py-2
-          text-sm text-white placeholder:text-zinc-500 outline-none
-          focus:border-orange-500 transition"
+          className="w-full bg-transparent border-b border-border py-2
+          text-sm text-foreground placeholder:text-muted-foreground outline-none
+          focus:border-brand transition"
         />
         {errors.email && (
-          <p className="text-red-500 text-[11px]">{errors.email.message}</p>
+          <p className="text-destructive text-[11px]">{errors.email.message}</p>
         )}
       </div>
 
@@ -70,22 +70,22 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           type={showPassword ? "text" : "password"}
           {...register("password")}
           placeholder="Senha"
-          className="w-full bg-transparent border-b border-white/10 py-2 pr-8
-          text-sm text-white placeholder:text-zinc-500 outline-none
-          focus:border-orange-500 transition"
+          className="w-full bg-transparent border-b border-border py-2 pr-8
+          text-sm text-foreground placeholder:text-muted-foreground outline-none
+          focus:border-brand transition"
         />
 
         {/* Toggle senha */}
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition"
+          className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
         >
           {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
         </button>
 
         {errors.password && (
-          <p className="text-red-500 text-[11px]">{errors.password.message}</p>
+          <p className="text-destructive text-[11px]">{errors.password.message}</p>
         )}
       </div>
 
@@ -94,7 +94,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         <div className="text-right">
           <button
             type="button"
-            className="text-[11px] text-zinc-500 hover:text-orange-500 transition"
+            className="text-[11px] text-muted-foreground hover:text-brand transition"
           >
             Esqueceu a senha?
           </button>
@@ -105,7 +105,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       <Button
         type="submit"
         disabled={loading}
-        className="w-full h-10 rounded-lg bg-orange-500 hover:bg-orange-600
+        className="w-full h-10 rounded-lg bg-brand text-brand-foreground hover:opacity-90
         text-sm font-medium transition flex items-center justify-center gap-2"
       >
         {loading && <BiLoader className="w-4 h-4 animate-spin" />}

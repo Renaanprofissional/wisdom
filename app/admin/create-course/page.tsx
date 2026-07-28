@@ -106,21 +106,21 @@ export default function CreateCoursePage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0d0d0d] to-[#121212] text-white flex items-center justify-center px-4 sm:px-6 py-6">
-      <div className="bg-[#111] border border-orange-500/10 p-5 sm:p-8 rounded-2xl w-full max-w-md space-y-6">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 sm:px-6 py-6">
+      <div className="bg-card border border-border p-5 sm:p-8 rounded-2xl w-full max-w-md space-y-6">
         <Link
           href="/admin"
-          className="inline-flex items-center gap-2 text-orange-400 text-sm sm:text-base"
+          className="inline-flex items-center gap-2 text-brand text-sm sm:text-base"
         >
           <FiArrowLeft /> Voltar
         </Link>
 
-        <h1 className="text-xl sm:text-2xl font-bold text-center bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-center text-brand flex items-center justify-center gap-2">
           <FiLayers /> Criar Curso
         </h1>
 
-        <div className="bg-black/40 border border-orange-500/10 p-4 rounded-xl space-y-3">
-          <p className="text-xs sm:text-sm font-bold text-orange-400 flex items-center gap-2">
+        <div className="bg-muted border border-border p-4 rounded-xl space-y-3">
+          <p className="text-xs sm:text-sm font-bold text-brand flex items-center gap-2">
             <FiGlobe /> Novo idioma
           </p>
 
@@ -128,20 +128,20 @@ export default function CreateCoursePage() {
             placeholder="Nome (ex: Espanhol)"
             value={newLanguageName}
             onChange={(e) => setNewLanguageName(e.target.value)}
-            className="w-full p-3 bg-black/50 border border-orange-500/20 rounded-lg text-sm sm:text-base focus:outline-none"
+            className="w-full p-3 bg-background border border-border rounded-lg text-sm sm:text-base focus:outline-none"
           />
 
           <input
             placeholder="Código (ex: es)"
             value={newLanguageCode}
             onChange={(e) => setNewLanguageCode(e.target.value)}
-            className="w-full p-3 bg-black/50 border border-orange-500/20 rounded-lg text-sm sm:text-base focus:outline-none"
+            className="w-full p-3 bg-background border border-border rounded-lg text-sm sm:text-base focus:outline-none"
           />
 
           <button
             onClick={handleCreateLanguage}
             disabled={creatingLanguage}
-            className="w-full flex items-center justify-center gap-2 bg-orange-500 py-2.5 rounded-lg font-semibold text-sm sm:text-base"
+            className="w-full flex items-center justify-center gap-2 bg-brand text-brand-foreground py-2.5 rounded-lg font-semibold text-sm sm:text-base hover:opacity-90"
           >
             {creatingLanguage ? (
               <FiRefreshCw className="animate-spin" />
@@ -155,7 +155,7 @@ export default function CreateCoursePage() {
         <select
           value={sourceLanguageId}
           onChange={(e) => setSourceLanguageId(e.target.value)}
-          className="w-full p-3 bg-black/50 border border-orange-500/20 rounded-lg text-sm sm:text-base"
+          className="w-full p-3 bg-background border border-border rounded-lg text-sm sm:text-base"
         >
           <option value="">Idioma de origem</option>
           {languages.map((lang) => (
@@ -168,7 +168,7 @@ export default function CreateCoursePage() {
         <select
           value={targetLanguageId}
           onChange={(e) => setTargetLanguageId(e.target.value)}
-          className="w-full p-3 bg-black/50 border border-orange-500/20 rounded-lg text-sm sm:text-base"
+          className="w-full p-3 bg-background border border-border rounded-lg text-sm sm:text-base"
         >
           <option value="">Idioma de destino</option>
           {languages.map((lang) => (
@@ -179,7 +179,7 @@ export default function CreateCoursePage() {
         </select>
 
         {languages.length === 0 && (
-          <p className="text-red-400 text-xs sm:text-sm text-center">
+          <p className="text-destructive text-xs sm:text-sm text-center">
             Nenhum idioma encontrado. Crie um primeiro.
           </p>
         )}
@@ -187,7 +187,7 @@ export default function CreateCoursePage() {
         <button
           onClick={handleCreate}
           disabled={loading}
-          className="w-full bg-linear-to-r from-orange-500 to-orange-600 py-3 rounded-lg font-bold flex items-center justify-center gap-2 text-sm sm:text-base"
+          className="w-full bg-brand text-brand-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 text-sm sm:text-base hover:opacity-90"
         >
           {loading ? <FiRefreshCw className="animate-spin" /> : <FiLayers />}
           {loading ? "Criando..." : "Criar Curso"}

@@ -83,13 +83,9 @@ export default function Authentication() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#050505] text-white relative overflow-hidden">
-      {/* BACKGROUND GRADIENT */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(255,115,0,0.12),transparent_40%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_90%,rgba(255,115,0,0.08),transparent_40%)]" />
-
+    <div className="min-h-screen flex bg-background text-foreground relative overflow-hidden">
       {/* LEFT SIDE */}
-      <div className="hidden md:flex w-1/2 relative border-r border-white/5">
+      <div className="hidden md:flex w-1/2 relative border-r border-border">
         <Image
           src="/bg.png"
           alt="Background"
@@ -101,7 +97,7 @@ export default function Authentication() {
         />
 
         <div className="relative z-10 p-16 flex flex-col justify-between">
-          <h1 className="text-xs tracking-[0.6em] text-zinc-700 uppercase">
+          <h1 className="text-xs tracking-[0.6em] text-muted-foreground uppercase">
             Wisdom
           </h1>
 
@@ -109,12 +105,12 @@ export default function Authentication() {
             <h2 className="text-3xl font-semibold leading-tight">
               {t("title")}
             </h2>
-            <p className="text-zinc-400 text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               {t("description")}
             </p>
           </div>
 
-          <p className="text-xs text-zinc-700">
+          <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Wisdom School
           </p>
         </div>
@@ -130,47 +126,38 @@ export default function Authentication() {
               alt="Logo"
               width={120}
               height={120}
-              className="opacity-90 drop-shadow-[0_0_30px_rgba(255,115,0,0.35)]"
+              className="opacity-90"
             />
           </div>
 
           {/* CARD */}
-          <div className="relative bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-3xl shadow-[0_0_60px_rgba(0,0,0,0.6)] overflow-hidden">
-            {/* GLOW */}
-            <div className="absolute inset-0 bg-linear-to-br from-orange-500/10 via-transparent to-transparent pointer-events-none" />
-
+          <div className="bg-card border border-border rounded-2xl p-6">
             {/* SOCIAL */}
-            <div className="flex gap-3 relative z-10">
+            <div className="flex gap-3">
               <AuthGoogleButton loading={loading} onClick={handleGoogle} />
             </div>
 
             {/* DIVIDER */}
-            <div className="flex items-center gap-3 my-6 relative z-10">
-              <div className="flex-1 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
-              <span className="text-xs text-zinc-500">ou</span>
-              <div className="flex-1 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
+            <div className="flex items-center gap-3 my-6">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-muted-foreground">ou</span>
+              <div className="flex-1 h-px bg-border" />
             </div>
 
             {/* FORM */}
-            <div className="relative z-10">
-              <AuthForm
-                isLogin={isLogin}
-                loading={loading}
-                onSubmit={onSubmit}
-              />
-            </div>
+            <AuthForm isLogin={isLogin} loading={loading} onSubmit={onSubmit} />
 
             {/* TEXT */}
-            <p className="text-zinc-400 text-xs text-center mt-5 relative z-10">
+            <p className="text-muted-foreground text-xs text-center mt-5">
               {isLogin ? `${t("login")}` : `${t("signup")}`}
             </p>
 
             {/* SWITCH */}
-            <p className="text-center text-sm text-zinc-500 mt-6 relative z-10">
+            <p className="text-center text-sm text-muted-foreground mt-6">
               {isLogin ? "Não tem conta?" : "Já possui conta?"}
               <button
                 onClick={() => setIsLogin(!isLogin)}
-                className="ml-2 text-orange-500 hover:text-orange-400 transition font-semibold"
+                className="ml-2 text-brand hover:opacity-80 transition font-semibold"
               >
                 {isLogin ? "Criar conta" : "Entrar"}
               </button>
@@ -181,7 +168,7 @@ export default function Authentication() {
         {/* BACK BUTTON */}
         <div className="absolute bottom-6 left-6">
           <Link href="/">
-            <Button className="w-11 h-11 rounded-full bg-white/5 border border-white/10 hover:bg-orange-500/20 hover:scale-110 transition-all duration-300 backdrop-blur-xl">
+            <Button className="w-11 h-11 rounded-full bg-card border border-border hover:bg-muted transition-all duration-300">
               ←
             </Button>
           </Link>

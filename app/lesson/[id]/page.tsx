@@ -1,7 +1,6 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { userAgent } from "next/server";
 import { useEffect, useRef, useState } from "react";
 import { FaCheckCircle, FaHome, FaRedo } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -264,7 +263,7 @@ export default function LessonPage() {
 
   if (!lesson) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050505] text-orange-400 text-lg animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-background text-brand text-lg animate-pulse">
         Carregando lição...
       </div>
     );
@@ -272,31 +271,22 @@ export default function LessonPage() {
 
   if (finished) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050505] text-white px-6">
-        <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 flex flex-col items-center gap-6 shadow-2xl">
-          {/* Ícone */}
-          <div className="relative">
-            <FaCheckCircle className="text-6xl text-orange-400 animate-pulse" />
-            <div className="absolute inset-0 blur-2xl bg-orange-400/30 rounded-full"></div>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-6">
+        <div className="w-full max-w-md bg-card border border-border rounded-3xl p-8 flex flex-col items-center gap-6">
+          <FaCheckCircle className="text-6xl text-brand" />
 
-          {/* Título */}
-          <h1 className="text-3xl font-bold text-center bg-linear-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
-            Lição concluída!
-          </h1>
+          <h1 className="text-3xl font-bold text-center">Lição concluída!</h1>
 
-          {/* Subtexto */}
-          <p className="text-white/60 text-center text-sm leading-relaxed">
+          <p className="text-muted-foreground text-center text-sm leading-relaxed">
             {lesson.alreadyCompleted
               ? "Você revisou essa lição com sucesso. Consistência é o segredo 🚀"
               : "Parabéns! Você ganhou XP e está evoluindo cada vez mais 🔥"}
           </p>
 
-          {/* Botões */}
           <div className="flex w-full gap-3 mt-2">
             <button
               onClick={resetLesson}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl transition-all duration-200 active:scale-95"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-muted hover:bg-muted/70 rounded-xl transition-all duration-200 active:scale-95"
             >
               <FaRedo />
               Refazer
@@ -304,7 +294,7 @@ export default function LessonPage() {
 
             <button
               onClick={() => router.push("/")}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-orange-400 to-amber-500 text-black font-semibold rounded-xl shadow-lg hover:brightness-110 transition-all duration-200 active:scale-95"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-brand text-brand-foreground font-semibold rounded-xl hover:opacity-90 transition-all duration-200 active:scale-95"
             >
               <FaHome />
               Dashboard
@@ -319,24 +309,24 @@ export default function LessonPage() {
   if (!question) return null;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* HEADER */}
-      <header className="p-5 border-b border-orange-500/10 bg-[#0a0a0a]/80 backdrop-blur-xl space-y-3">
-        <p className="text-sm text-white/50">
+      <header className="p-5 border-b border-border bg-background/80 backdrop-blur-xl space-y-3">
+        <p className="text-sm text-muted-foreground">
           {lesson.title} • {current + 1}/{lesson.questions.length}
         </p>
 
         {lesson.alreadyCompleted && (
-          <div className="text-xs text-orange-400">🔁 Revisando lição</div>
+          <div className="text-xs text-brand">🔁 Revisando lição</div>
         )}
 
-        <div className="text-sm text-orange-400">
+        <div className="text-sm text-brand">
           ❤️ {isUnlimited ? "∞" : (lives ?? "...")}
         </div>
 
-        <div className="w-full h-2 bg-[#111] rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
           <div
-            className="h-2 bg-linear-to-r from-orange-400 to-amber-500 shadow-[0_0_10px_rgba(255,140,0,0.7)] transition-all"
+            className="h-2 bg-brand transition-all"
             style={{
               width: `${((current + 1) / lesson.questions.length) * 100}%`,
             }}
@@ -354,21 +344,18 @@ export default function LessonPage() {
           {question.options.map((opt) => {
             const isSelected = selected?.id === opt.id;
 
-            let style = "bg-[#0f0f0f] border-orange-500/10 hover:bg-[#1a1a1a]";
+            let style = "bg-card border-border hover:bg-muted";
 
             if (isSelected && status === "idle") {
-              style =
-                "bg-orange-500/10 border-orange-500 shadow-[0_0_10px_rgba(255,140,0,0.5)]";
+              style = "bg-brand/10 border-brand";
             }
 
             if (status === "correct" && isSelected) {
-              style =
-                "bg-green-500/20 border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]";
+              style = "bg-green-500/15 border-green-500";
             }
 
             if (status === "wrong" && isSelected) {
-              style =
-                "bg-red-500/20 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]";
+              style = "bg-destructive/15 border-destructive";
             }
 
             return (
@@ -386,14 +373,14 @@ export default function LessonPage() {
       </main>
 
       {/* FOOTER */}
-      <footer className="p-5 border-t border-orange-500/10 bg-[#0a0a0a]/80 backdrop-blur-xl">
+      <footer className="p-5 border-t border-border bg-background/80 backdrop-blur-xl">
         {status === "wrong" ? (
           <button
             onClick={() => {
               setSelected(null);
               setStatus("idle");
             }}
-            className="w-full py-3 bg-red-500/80 hover:bg-red-500 rounded-xl font-semibold transition"
+            className="w-full py-3 bg-destructive/15 hover:bg-destructive/25 text-destructive rounded-xl font-semibold transition"
           >
             Tentar novamente
           </button>
@@ -401,7 +388,7 @@ export default function LessonPage() {
           <button
             onClick={handleNext}
             disabled={!selected || loading || validating}
-            className="w-full py-3 bg-linear-to-r from-orange-400 to-amber-500 text-black font-semibold rounded-xl shadow-lg disabled:opacity-40 transition"
+            className="w-full py-3 bg-brand text-brand-foreground font-semibold rounded-xl disabled:opacity-40 transition hover:opacity-90"
           >
             {validating
               ? "Verificando..."
